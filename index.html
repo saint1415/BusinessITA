@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Business ITA - Local</title>
+  <link rel="icon" href="assets/icons/business-ita.svg" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body>
+  <header class="app-header">
+    <div class="brand">
+      <img src="assets/icons/business-ita.svg" alt="" class="logo" />
+      <div>
+        <h1>Business ITA - Local</h1>
+        <p class="subtitle">Incident Template Assistant (HTML/JS, offline-capable)</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button id="themeToggle" class="btn ghost" aria-label="Toggle theme">Dark</button>
+      <button id="generateId" class="btn">Generate ID</button>
+      <button id="saveRevision" class="btn">Save Revision</button>
+      <label class="file-btn">
+        <input type="file" id="uploadIncident" accept=".json" hidden />
+        <span class="btn">Open Incident JSON</span>
+      </label>
+      <label class="file-btn">
+        <input type="file" id="uploadRendered" accept=".txt,.md,.html" hidden multiple />
+        <span class="btn">Open Rendered Docs</span>
+      </label>
+      <button id="downloadIncident" class="btn">Download Incident JSON</button>
+      <button id="downloadBundle" class="btn">Download Bundle (TXT)</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <nav class="sidebar">
+      <div class="panel">
+        <h3>Incident</h3>
+        <div class="field">
+          <label>Incident ID</label>
+          <input id="incidentId" placeholder="YYYYMM_NN or YYYYMM_NN.RR" />
+        </div>
+        <div class="field two">
+          <div>
+            <label>Name</label>
+            <input id="incidentName" placeholder="Payment Processing Degradation" />
+          </div>
+          <div>
+            <label>Severity</label>
+            <select id="incidentSeverity">
+              <option value="">Select</option>
+              <option>S0</option><option>S1</option><option>S2</option><option>S3</option>
+            </select>
+          </div>
+        </div>
+        <div class="field two">
+          <div>
+            <label>Start Time</label>
+            <input id="startTime" type="datetime-local" />
+          </div>
+          <div>
+            <label>Next Update</label>
+            <input id="nextUpdateTime" type="time" />
+          </div>
+        </div>
+        <div class="field">
+          <label>Impact Summary</label>
+          <textarea id="impactSummary" rows="3" placeholder="Brief user-facing effect"></textarea>
+        </div>
+        <div class="field two">
+          <div>
+            <label>IC Name</label>
+            <input id="icName" />
+          </div>
+          <div>
+            <label>Contact</label>
+            <input id="contact" placeholder="incidents@company.com" />
+          </div>
+        </div>
+        <div class="field two">
+          <div>
+            <label>Customers Affected</label>
+            <input id="customersAffected" placeholder="e.g., 18% EU traffic" />
+          </div>
+          <div>
+            <label>$ Impact / hr</label>
+            <input id="dollarImpactPerHour" type="number" min="0" step="100" />
+          </div>
+        </div>
+        <div class="field">
+          <label>Status</label>
+          <input id="currentStatus" placeholder="Investigating / Identified / Monitoring" />
+        </div>
+        <div class="field">
+          <label>Root Cause Status</label>
+          <input id="rootCauseStatus" placeholder="Hypothesis / Cause identified ..." />
+        </div>
+        <div class="field two">
+          <div>
+            <label>ETA</label>
+            <input id="eta" placeholder="e.g., 45 minutes" />
+          </div>
+          <div>
+            <label>Status Page</label>
+            <input id="linkStatusPage" placeholder="https://status.company.internal" />
+          </div>
+        </div>
+        <div class="field two">
+          <div>
+            <label>Jurisdiction</label>
+            <select id="jurisdiction">
+              <option value="global">Global</option>
+              <option value="EU">EU (GDPR)</option>
+              <option value="US">US</option>
+              <option value="SEC">US (SEC)</option>
+            </select>
+          </div>
+          <div>
+            <label>Ticket ID</label>
+            <input id="ticketId" placeholder="INC-1234/JIRA-5678" />
+          </div>
+        </div>
+        <div class="divider"></div>
+        <div class="field">
+          <label>Audience</label>
+          <select id="audienceSelect" multiple size="6">
+            <option value="internal">Internal Responders</option>
+            <option value="executive">Executives/Leadership</option>
+            <option value="customers">Customers</option>
+            <option value="regulators">Regulators/Authorities</option>
+            <option value="media">Media/PR</option>
+            <option value="support">Support</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Jurisdiction Modules</label>
+          <div class="chips">
+            <label><input type="checkbox" class="jur-module" value="gdpr" /> GDPR</label>
+            <label><input type="checkbox" class="jur-module" value="ccpa" /> CCPA</label>
+            <label><input type="checkbox" class="jur-module" value="sec" /> SEC</label>
+          </div>
+        </div>
+        <button id="generateComms" class="btn primary full">Generate Communications</button>
+      </div>
+
+      <div class="panel">
+        <h3>Templates</h3>
+        <div id="templateFilters" class="filters">
+          <select id="templateAudienceFilter">
+            <option value="">All audiences</option>
+            <option value="internal">Internal</option>
+            <option value="executive">Executive</option>
+            <option value="customers">Customers</option>
+            <option value="regulators">Regulators</option>
+            <option value="media">Media</option>
+            <option value="support">Support</option>
+          </select>
+          <select id="templateSeverityFilter">
+            <option value="">All severities</option>
+            <option>S0</option><option>S1</option><option>S2</option><option>S3</option>
+          </select>
+        </div>
+        <ul id="templateList" class="template-list"></ul>
+        <div class="actions">
+          <label class="file-btn small">
+            <input type="file" id="uploadTemplate" accept=".json,.md" hidden />
+            <span class="btn small">Add Template</span>
+          </label>
+        </div>
+      </div>
+    </nav>
+
+    <section class="content">
+      <div class="tabs">
+        <button class="tab active" data-tab="editor">Editor</button>
+        <button class="tab" data-tab="rendered">Rendered Output</button>
+        <button class="tab" data-tab="preview">Preview (Print)</button>
+      </div>
+
+      <div class="tabpanes">
+        <div class="tabpanel active" id="editor">
+          <div class="editor-grid">
+            <div class="panel">
+              <h3>Selected Template</h3>
+              <div id="selectedTemplateMeta" class="meta"></div>
+              <textarea id="templateRaw" rows="14" spellcheck="false"></textarea>
+              <div class="hint">Tokens use [UPPER_SNAKE_CASE]. Avoid changing token names to keep consistency.</div>
+              <div class="actions">
+                <button id="applyTemplate" class="btn">Apply to Incident</button>
+              </div>
+            </div>
+            <div class="panel">
+              <h3>Detected Tokens</h3>
+              <form id="tokenForm" class="token-form"></form>
+            </div>
+          </div>
+        </div>
+
+        <div class="tabpanel" id="rendered">
+          <div class="panel">
+            <h3>Rendered Communication</h3>
+            <div class="toolbar">
+              <button id="copyRendered" class="btn">Copy</button>
+              <button id="downloadRenderedTxt" class="btn">Download .txt</button>
+            </div>
+            <pre id="renderedText" class="rendered"></pre>
+          </div>
+        </div>
+
+        <div class="tabpanel" id="preview">
+          <div class="panel">
+            <h3>Print Preview</h3>
+            <div class="toolbar">
+              <button onclick="window.print()" class="btn">Print to PDF</button>
+            </div>
+            <article id="printPreview" class="preview"></article>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <span>Business ITA - Local</span>
+    <span>HTML/JS only • Runs offline • Evergreen browsers</span>
+  </footer>
+
+  <script src="assets/js/templates.js"></script>
+  <script src="assets/js/store.js"></script>
+  <script src="assets/js/render.js"></script>
+  <script src="assets/js/parser.js"></script>
+  <script src="assets/js/ui.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>
