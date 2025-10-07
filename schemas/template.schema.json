@@ -1,0 +1,41 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "audience": {
+      "type": "string"
+    },
+    "severity": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "version": {
+      "type": "string"
+    },
+    "tokens_required": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "body": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "title",
+    "audience",
+    "severity",
+    "version",
+    "body"
+  ]
+}

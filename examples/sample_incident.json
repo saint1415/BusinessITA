@@ -1,0 +1,19 @@
+{
+  "incident_id": "202510_01",
+  "revision": "00",
+  "name": "Payment Processing Degradation",
+  "severity": "S1",
+  "start_time": "2025-10-07T18:54:40.758605",
+  "next_update_time": "10:00",
+  "impact_summary": "Elevated payment failures in EU region",
+  "ic_name": "Alex Morgan",
+  "contact": "incidents@example.com",
+  "customers_affected": "18% EU traffic",
+  "dollar_impact_per_hour": "120000",
+  "current_status": "Investigating",
+  "root_cause_status": "Hypothesis under validation",
+  "eta": "45 minutes",
+  "link_status_page": "https://status.example.internal",
+  "jurisdiction": "EU",
+  "ticket_id": "JIRA-1234"
+}

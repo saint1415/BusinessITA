@@ -1,0 +1,3 @@
+# Generic Incident Runbook
+
+Tokens: [INCIDENT_NAME] [SEVERITY] ...

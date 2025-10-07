@@ -1,0 +1,13 @@
+function detectTokens(text){const re=/\[([A-Z0-9_+\-\/]+)\]/g;const tokens=new Set();let m;while((m=re.exec(text))!==null)tokens.add(m[1]);return Array.from(tokens)}
+function mapIncidentToTokens(incident){return{INCIDENT_ID:incident.incident_id||"",INCIDENT_NAME:incident.name||"",SEVERITY:incident.severity||"",START_TIME:incident.start_time||"",NEXT_UPDATE_TIME:incident.next_update_time||"",IMPACT_SUMMARY:incident.impact_summary||"",IC_NAME:incident.ic_name||"",CONTACT:incident.contact||"",CUSTOMERS_AFFECTED:incident.customers_affected||"",DOLLAR_IMPACT_PER_HOUR:incident.dollar_impact_per_hour||"","$IMPACT":incident.dollar_impact_per_hour||"",CURRENT_STATUS:incident.current_status||"",ROOT_CAUSE_STATUS:incident.root_cause_status||"",ETA:incident.eta||"",LINK_STATUS_PAGE:incident.link_status_page||"",JURISDICTION:incident.jurisdiction||"",TICKET_ID:incident.ticket_id||""}} 
+function checksum(text){let h=0x811c9dc5;for(let i=0;i<text.length;i++){h^=text.charCodeAt(i);h=(h+((h<<1)+(h<<4)+(h<<7)+(h<<8)+(h<<24)))>>>0}return("00000000"+h.toString(16)).slice(-8)}
+function renderTemplate(text,tokensMap,jurisdictionModules=[]){let rendered=text; if(jurisdictionModules&&jurisdictionModules.length){const mods=window.BITA_TEMPLATES.modules.jurisdictions;const inserts=jurisdictionModules.map(k=>mods[k]).filter(Boolean).join("
+");if(inserts){rendered+="
+
+"+inserts}} for(const [k,v] of Object.entries(tokensMap)){const re=new RegExp(`\[${k.replace(/[-\/\^$*+?.()|[\]{}]/g,"\$&")}\]`,`g`);rendered=rendered.replace(re,v||"")} return rendered}
+function buildMetadataBlock(incident,templateMeta,bodyText){const meta={_meta:{tool:"Business ITA - Local",version:"0.2.0",timestamp:new Date().toISOString(),template_id:templateMeta?.id||null,template_version:templateMeta?.version||null,incident_id:incident.incident_id||null,revision:incident.revision??null,body_checksum:checksum(bodyText)},incident}; const block=["-----BEGIN ITA METADATA-----",JSON.stringify(meta,null,2),"-----END ITA METADATA-----"].join("
+"); return {meta,block}}
+function buildRenderedWithMetadata(rawText,incident,templateMeta,jurisdictionModules){const tokenMap=mapIncidentToTokens(incident);const body=renderTemplate(rawText,tokenMap,jurisdictionModules);const {block}=buildMetadataBlock(incident,templateMeta,body);return body+"
+
+"+block}
+window.BITA_RENDER={detectTokens,mapIncidentToTokens,renderTemplate,buildMetadataBlock,buildRenderedWithMetadata,checksum};

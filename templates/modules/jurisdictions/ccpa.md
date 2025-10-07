@@ -1,0 +1,1 @@
+Legal notice (CCPA): We are assessing the scope of personal information involved and will provide required notices.

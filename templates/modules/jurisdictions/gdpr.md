@@ -1,0 +1,1 @@
+Legal notice (GDPR): We are evaluating personal data impact and will notify affected data subjects and authorities as required.

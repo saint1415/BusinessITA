@@ -1,0 +1,1 @@
+Legal notice (SEC): We are evaluating materiality and disclosure timing consistent with applicable rules.

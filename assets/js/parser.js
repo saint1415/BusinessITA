@@ -1,0 +1,7 @@
+function parseMetadataFromRendered(text){const start=text.indexOf("-----BEGIN ITA METADATA-----");const end=text.indexOf("-----END ITA METADATA-----");if(start!==-1&&end!==-1&&end>start){const json=text.substring(start+"-----BEGIN ITA METADATA-----".length,end).trim();try{return JSON.parse(json)}catch(e){console.warn("Failed to parse metadata JSON",e)}}return null}
+function stripMetadata(text){return text.replace(/-----BEGIN ITA METADATA-----[\s\S]*-----END ITA METADATA-----/g,"").trim()}
+function updateIncidentFromRendered(text,currentIncident){const meta=parseMetadataFromRendered(text);if(meta?.incident){const next={...currentIncident,...meta.incident};if(meta._meta?.incident_id) next.incident_id=meta._meta.incident_id; if(meta._meta?.revision!==undefined) next.revision=meta._meta.revision; return {incident:next,source:"metadata"}} const body=stripMetadata(text); const incident={...currentIncident}; const tryExtract=(regexes)=>{for(const r of regexes){const m=body.match(r);if(m&&m[1]) return m[1].trim()} return null}; const impact=tryExtract([/Impact(?: now)?:\s*(.+)$/im,/causing\s+(.+?)\./im]); if(impact) incident.impact_summary=impact; const status=tryExtract([/Status:\s*(.+?)(?:\.|
+)/i]); if(status) incident.current_status=status; const root=tryExtract([/Root cause:\s*(.+?)(?:\.|
+)/i]); if(root) incident.root_cause_status=root; const eta=tryExtract([/ETA:\s*(.+?)(?:\.|
+)/i]); if(eta) incident.eta=eta; return {incident,source:"heuristic"}}
+window.BITA_PARSER={parseMetadataFromRendered,updateIncidentFromRendered,stripMetadata};
