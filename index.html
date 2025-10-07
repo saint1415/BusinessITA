@@ -3,150 +3,261 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Business ITA - Local</title>
+  <title>Business ITA - Incident Template Assistant</title>
   <link rel="icon" href="assets/icons/business-ita.svg" />
-  <link rel="stylesheet" href="assets/css/style.css" />
+  <style>
+    /* 1. CSS RESET & GLOBAL STYLES */
+    :root {
+      --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      --font-mono: 'SF Mono', 'Fira Code', 'Fira Mono', 'Roboto Mono', monospace;
+
+      /* Light Theme */
+      --bg-main: #f4f7fa;
+      --bg-panel: #ffffff;
+      --text-primary: #1a202c;
+      --text-secondary: #4a5568;
+      --text-muted: #718096;
+      --border-color: #e2e8f0;
+      --accent-color: #3b82f6;
+      --accent-hover: #2563eb;
+      --success-color: #10b981;
+      --danger-color: #ef4444;
+      --input-bg: #ffffff;
+    }
+
+    [data-theme="dark"] {
+      --bg-main: #1a202c;
+      --bg-panel: #2d3748;
+      --text-primary: #edf2f7;
+      --text-secondary: #a0aec0;
+      --text-muted: #718096;
+      --border-color: #4a5568;
+      --accent-color: #60a5fa;
+      --accent-hover: #3b82f6;
+      --success-color: #34d399;
+      --danger-color: #f87171;
+      --input-bg: #4a5568;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: var(--font-sans);
+      background-color: var(--bg-main);
+      color: var(--text-primary);
+      font-size: 16px;
+      line-height: 1.6;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      transition: background-color 0.2s, color 0.2s;
+    }
+    
+    /* 2. LAYOUT & STRUCTURE */
+    .app-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem 1.5rem;
+      background-color: var(--bg-panel);
+      border-bottom: 1px solid var(--border-color);
+      flex-shrink: 0;
+    }
+
+    .app-main {
+      flex-grow: 1;
+      display: grid;
+      grid-template-columns: 320px 1fr 1fr; /* Sidebar | Editor | Preview */
+      gap: 1.5rem;
+      padding: 1.5rem;
+      overflow: hidden; /* Prevent layout shift from scrollbars */
+    }
+
+    .sidebar, .editor-pane, .preview-pane {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      overflow-y: auto; /* Allow columns to scroll independently */
+    }
+
+    .app-footer {
+      padding: 0.75rem 1.5rem;
+      background-color: var(--bg-panel);
+      border-top: 1px solid var(--border-color);
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      text-align: center;
+      flex-shrink: 0;
+    }
+    
+    /* Custom Scrollbars */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: var(--bg-main); }
+    ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+    /* 3. COMPONENTS */
+    .brand { display: flex; align-items: center; gap: 0.75rem; }
+    .brand .logo { width: 32px; height: 32px; }
+    .brand h1 { font-size: 1.25rem; line-height: 1.2; }
+    .brand .subtitle { font-size: 0.8rem; color: var(--text-muted); }
+
+    .header-actions { display: flex; align-items: center; gap: 0.5rem; }
+    
+    .panel {
+      background-color: var(--bg-panel);
+      border: 1px solid var(--border-color);
+      border-radius: 0.5rem;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .panel h3 { font-size: 1.1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem; margin-bottom: 0.25rem; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      border-radius: 0.375rem;
+      border: 1px solid transparent;
+      font-weight: 600;
+      font-size: 0.875rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      background-color: var(--bg-panel);
+      color: var(--text-primary);
+      border-color: var(--border-color);
+    }
+    .btn:hover { border-color: var(--accent-color); color: var(--accent-color); }
+    
+    .btn.primary { background-color: var(--accent-color); color: white; border-color: var(--accent-color); }
+    .btn.primary:hover { background-color: var(--accent-hover); border-color: var(--accent-hover); }
+
+    /* Dropdown Menu */
+    details.dropdown { position: relative; }
+    details.dropdown summary { list-style: none; cursor: pointer; }
+    details.dropdown summary::-webkit-details-marker { display: none; }
+    details.dropdown .menu {
+      position: absolute;
+      top: calc(100% + 0.5rem);
+      right: 0;
+      background-color: var(--bg-panel);
+      border: 1px solid var(--border-color);
+      border-radius: 0.5rem;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
+      padding: 0.5rem;
+      width: 200px;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+    details.dropdown .menu button,
+    details.dropdown .menu .file-btn { width: 100%; text-align: left; }
+    
+    .file-btn input[type="file"] { display: none; }
+
+    /* Forms */
+    fieldset { border: none; }
+    .field { display: flex; flex-direction: column; gap: 0.25rem; }
+    .field label { font-size: 0.875rem; font-weight: 500; color: var(--text-secondary); }
+    .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 0.5rem 0.75rem;
+      background-color: var(--input-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 0.375rem;
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      font-size: 0.9rem;
+    }
+    input:focus, select:focus, textarea:focus {
+      outline: 2px solid var(--accent-color);
+      outline-offset: 1px;
+      border-color: var(--accent-color);
+    }
+    textarea { resize: vertical; min-height: 80px; }
+    
+    .chips { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .chips label { display: flex; align-items: center; gap: 0.25rem; font-size: 0.875rem; }
+
+    /* Template List */
+    .template-list { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; }
+    .template-list li {
+        padding: 0.75rem;
+        border: 1px solid var(--border-color);
+        border-radius: 0.375rem;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .template-list li:hover { background-color: var(--bg-main); border-color: var(--accent-color); }
+    .template-list li.active { background-color: var(--accent-color); border-color: var(--accent-color); color: white; }
+
+    /* Rendered/Preview Panes */
+    .toolbar { display: flex; justify-content: flex-end; gap: 0.5rem; }
+    pre.rendered, article.preview {
+      background-color: var(--bg-main);
+      border: 1px solid var(--border-color);
+      border-radius: 0.375rem;
+      padding: 1rem;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      font-family: var(--font-mono);
+      font-size: 0.875rem;
+      min-height: 200px;
+    }
+    article.preview { font-family: var(--font-sans); }
+
+  </style>
 </head>
 <body>
+
   <header class="app-header">
     <div class="brand">
-      <img src="assets/icons/business-ita.svg" alt="" class="logo" />
+      <img src="assets/icons/business-ita.svg" alt="Business ITA Logo" class="logo" />
       <div>
-        <h1>Business ITA - Local</h1>
-        <p class="subtitle">Incident Template Assistant (HTML/JS, offline-capable)</p>
+        <h1>Business ITA</h1>
+        <p class="subtitle">Incident Template Assistant</p>
       </div>
     </div>
     <div class="header-actions">
-      <button id="themeToggle" class="btn ghost" aria-label="Toggle theme">Dark</button>
-      <button id="generateId" class="btn">Generate ID</button>
-      <button id="saveRevision" class="btn">Save Revision</button>
-      <label class="file-btn">
-        <input type="file" id="uploadIncident" accept=".json" hidden />
-        <span class="btn">Open Incident JSON</span>
-      </label>
-      <label class="file-btn">
-        <input type="file" id="uploadRendered" accept=".txt,.md,.html" hidden multiple />
-        <span class="btn">Open Rendered Docs</span>
-      </label>
-      <button id="downloadIncident" class="btn">Download Incident JSON</button>
-      <button id="downloadBundle" class="btn">Download Bundle (TXT)</button>
+      <button id="themeToggle" class="btn" aria-label="Toggle theme">🌙</button>
+
+      <details class="dropdown">
+        <summary class="btn">File</summary>
+        <div class="menu">
+          <button id="saveRevision" class="btn">Save Revision</button>
+          <label class="file-btn">
+            <input type="file" id="uploadIncident" accept=".json" />
+            <span class="btn">Open Incident (.json)</span>
+          </label>
+        </div>
+      </details>
+      
+      <details class="dropdown">
+        <summary class="btn">Download</summary>
+        <div class="menu">
+          <button id="downloadIncident" class="btn">Download Incident (.json)</button>
+          <button id="downloadBundle" class="btn">Download Bundle (.txt)</button>
+        </div>
+      </details>
+      
+      <button id="generateId" class="btn primary">Generate New ID</button>
     </div>
   </header>
 
-  <main class="layout">
-    <nav class="sidebar">
-      <div class="panel">
-        <h3>Incident</h3>
-        <div class="field">
-          <label>Incident ID</label>
-          <input id="incidentId" placeholder="YYYYMM_NN or YYYYMM_NN.RR" />
-        </div>
-        <div class="field two">
-          <div>
-            <label>Name</label>
-            <input id="incidentName" placeholder="Payment Processing Degradation" />
-          </div>
-          <div>
-            <label>Severity</label>
-            <select id="incidentSeverity">
-              <option value="">Select</option>
-              <option>S0</option><option>S1</option><option>S2</option><option>S3</option>
-            </select>
-          </div>
-        </div>
-        <div class="field two">
-          <div>
-            <label>Start Time</label>
-            <input id="startTime" type="datetime-local" />
-          </div>
-          <div>
-            <label>Next Update</label>
-            <input id="nextUpdateTime" type="time" />
-          </div>
-        </div>
-        <div class="field">
-          <label>Impact Summary</label>
-          <textarea id="impactSummary" rows="3" placeholder="Brief user-facing effect"></textarea>
-        </div>
-        <div class="field two">
-          <div>
-            <label>IC Name</label>
-            <input id="icName" />
-          </div>
-          <div>
-            <label>Contact</label>
-            <input id="contact" placeholder="incidents@company.com" />
-          </div>
-        </div>
-        <div class="field two">
-          <div>
-            <label>Customers Affected</label>
-            <input id="customersAffected" placeholder="e.g., 18% EU traffic" />
-          </div>
-          <div>
-            <label>$ Impact / hr</label>
-            <input id="dollarImpactPerHour" type="number" min="0" step="100" />
-          </div>
-        </div>
-        <div class="field">
-          <label>Status</label>
-          <input id="currentStatus" placeholder="Investigating / Identified / Monitoring" />
-        </div>
-        <div class="field">
-          <label>Root Cause Status</label>
-          <input id="rootCauseStatus" placeholder="Hypothesis / Cause identified ..." />
-        </div>
-        <div class="field two">
-          <div>
-            <label>ETA</label>
-            <input id="eta" placeholder="e.g., 45 minutes" />
-          </div>
-          <div>
-            <label>Status Page</label>
-            <input id="linkStatusPage" placeholder="https://status.company.internal" />
-          </div>
-        </div>
-        <div class="field two">
-          <div>
-            <label>Jurisdiction</label>
-            <select id="jurisdiction">
-              <option value="global">Global</option>
-              <option value="EU">EU (GDPR)</option>
-              <option value="US">US</option>
-              <option value="SEC">US (SEC)</option>
-            </select>
-          </div>
-          <div>
-            <label>Ticket ID</label>
-            <input id="ticketId" placeholder="INC-1234/JIRA-5678" />
-          </div>
-        </div>
-        <div class="divider"></div>
-        <div class="field">
-          <label>Audience</label>
-          <select id="audienceSelect" multiple size="6">
-            <option value="internal">Internal Responders</option>
-            <option value="executive">Executives/Leadership</option>
-            <option value="customers">Customers</option>
-            <option value="regulators">Regulators/Authorities</option>
-            <option value="media">Media/PR</option>
-            <option value="support">Support</option>
-          </select>
-        </div>
-        <div class="field">
-          <label>Jurisdiction Modules</label>
-          <div class="chips">
-            <label><input type="checkbox" class="jur-module" value="gdpr" /> GDPR</label>
-            <label><input type="checkbox" class="jur-module" value="ccpa" /> CCPA</label>
-            <label><input type="checkbox" class="jur-module" value="sec" /> SEC</label>
-          </div>
-        </div>
-        <button id="generateComms" class="btn primary full">Generate Communications</button>
-      </div>
-
+  <main class="app-main">
+    
+    <aside class="sidebar">
       <div class="panel">
         <h3>Templates</h3>
-        <div id="templateFilters" class="filters">
+        <div class="field">
+          <label>Filter by Audience</label>
           <select id="templateAudienceFilter">
             <option value="">All audiences</option>
             <option value="internal">Internal</option>
@@ -156,74 +267,183 @@
             <option value="media">Media</option>
             <option value="support">Support</option>
           </select>
+        </div>
+        <div class="field">
+          <label>Filter by Severity</label>
           <select id="templateSeverityFilter">
             <option value="">All severities</option>
             <option>S0</option><option>S1</option><option>S2</option><option>S3</option>
           </select>
         </div>
-        <ul id="templateList" class="template-list"></ul>
-        <div class="actions">
-          <label class="file-btn small">
-            <input type="file" id="uploadTemplate" accept=".json,.md" hidden />
-            <span class="btn small">Add Template</span>
-          </label>
-        </div>
+        <ul id="templateList" class="template-list">
+          </ul>
+        <label class="file-btn">
+            <input type="file" id="uploadTemplate" accept=".json,.md" />
+            <span class="btn" style="width: 100%;">Add Custom Template</span>
+        </label>
       </div>
-    </nav>
+    </aside>
 
-    <section class="content">
-      <div class="tabs">
-        <button class="tab active" data-tab="editor">Editor</button>
-        <button class="tab" data-tab="rendered">Rendered Output</button>
-        <button class="tab" data-tab="preview">Preview (Print)</button>
+    <section class="editor-pane">
+      <div class="panel">
+        <h3>Incident Details</h3>
+        <fieldset>
+          <div class="field-grid">
+            <div class="field">
+              <label for="incidentId">Incident ID</label>
+              <input id="incidentId" placeholder="YYYYMM_NN or YYYYMM_NN.RR" />
+            </div>
+            <div class="field">
+              <label for="ticketId">Ticket ID</label>
+              <input id="ticketId" placeholder="INC-1234 / JIRA-5678" />
+            </div>
+          </div>
+          <div class="field">
+            <label for="incidentName">Name</label>
+            <input id="incidentName" placeholder="e.g., Payment Processing Degradation" />
+          </div>
+        </fieldset>
       </div>
 
-      <div class="tabpanes">
-        <div class="tabpanel active" id="editor">
-          <div class="editor-grid">
-            <div class="panel">
-              <h3>Selected Template</h3>
-              <div id="selectedTemplateMeta" class="meta"></div>
-              <textarea id="templateRaw" rows="14" spellcheck="false"></textarea>
-              <div class="hint">Tokens use [UPPER_SNAKE_CASE]. Avoid changing token names to keep consistency.</div>
-              <div class="actions">
-                <button id="applyTemplate" class="btn">Apply to Incident</button>
+      <div class="panel">
+        <h3>Timeline & Severity</h3>
+        <fieldset>
+          <div class="field-grid">
+            <div class="field">
+              <label for="startTime">Start Time (Local)</label>
+              <input id="startTime" type="datetime-local" />
+            </div>
+            <div class="field">
+              <label for="nextUpdateTime">Next Update (Local)</label>
+              <input id="nextUpdateTime" type="time" />
+            </div>
+          </div>
+          <div class="field-grid">
+            <div class="field">
+              <label for="incidentSeverity">Severity</label>
+              <select id="incidentSeverity">
+                <option value="">Select Severity</option>
+                <option>S0</option><option>S1</option><option>S2</option><option>S3</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="eta">ETA for Resolution</label>
+              <input id="eta" placeholder="e.g., 45 minutes" />
+            </div>
+          </div>
+        </fieldset>
+      </div>
+
+      <div class="panel">
+        <h3>Impact & Status</h3>
+        <fieldset>
+           <div class="field">
+              <label for="impactSummary">Impact Summary</label>
+              <textarea id="impactSummary" rows="3" placeholder="Brief, user-facing description of the effect"></textarea>
+            </div>
+            <div class="field-grid">
+              <div class="field">
+                <label for="customersAffected">Customers Affected</label>
+                <input id="customersAffected" placeholder="e.g., 18% of EU traffic" />
+              </div>
+              <div class="field">
+                <label for="dollarImpactPerHour">$ Impact / hr (est.)</label>
+                <input id="dollarImpactPerHour" type="number" min="0" step="100" />
               </div>
             </div>
-            <div class="panel">
-              <h3>Detected Tokens</h3>
-              <form id="tokenForm" class="token-form"></form>
+            <div class="field">
+              <label for="currentStatus">Current Status</label>
+              <input id="currentStatus" placeholder="e.g., Investigating, Identified, Monitoring" />
+            </div>
+            <div class="field">
+              <label for="rootCauseStatus">Root Cause Status</label>
+              <input id="rootCauseStatus" placeholder="e.g., Hypothesis, Cause identified" />
+            </div>
+        </fieldset>
+      </div>
+      
+      <div class="panel">
+        <h3>Stakeholders & Links</h3>
+        <fieldset>
+          <div class="field-grid">
+            <div class="field">
+              <label for="icName">Incident Commander (IC)</label>
+              <input id="icName" />
+            </div>
+            <div class="field">
+              <label for="contact">Contact Point</label>
+              <input id="contact" placeholder="incidents@company.com" />
             </div>
           </div>
-        </div>
+          <div class="field-grid">
+            <div class="field">
+              <label for="jurisdiction">Jurisdiction</label>
+              <select id="jurisdiction">
+                <option value="global">Global</option>
+                <option value="EU">EU (GDPR)</option>
+                <option value="US">US</option>
+                <option value="SEC">US (SEC)</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="linkStatusPage">Status Page URL</label>
+              <input id="linkStatusPage" placeholder="https://status.company.com" />
+            </div>
+          </div>
+        </fieldset>
+      </div>
 
-        <div class="tabpanel" id="rendered">
-          <div class="panel">
-            <h3>Rendered Communication</h3>
-            <div class="toolbar">
-              <button id="copyRendered" class="btn">Copy</button>
-              <button id="downloadRenderedTxt" class="btn">Download .txt</button>
-            </div>
-            <pre id="renderedText" class="rendered"></pre>
-          </div>
+      <div class="panel">
+        <h3>Communications Generator</h3>
+        <div class="field">
+          <label for="audienceSelect">Select Audience(s)</label>
+          <select id="audienceSelect" multiple size="6">
+            <option value="internal">Internal Responders</option>
+            <option value="executive">Executives/Leadership</option>
+            <option value="customers">Customers</option>
+            <option value="regulators">Regulators/Authorities</option>
+            <option value="media">Media/PR</option>
+            <option value="support">Support</option>
+          </select>
         </div>
+        <button id="generateComms" class="btn primary">Generate Communications</button>
+      </div>
+    </section>
 
-        <div class="tabpanel" id="preview">
-          <div class="panel">
-            <h3>Print Preview</h3>
-            <div class="toolbar">
-              <button onclick="window.print()" class="btn">Print to PDF</button>
-            </div>
-            <article id="printPreview" class="preview"></article>
-          </div>
+    <section class="preview-pane">
+      <div class="panel">
+        <h3>Selected Template Editor</h3>
+        <div id="selectedTemplateMeta" class="meta"></div>
+        <textarea id="templateRaw" rows="10" spellcheck="false" placeholder="Select a template from the list to view its raw content here..."></textarea>
+        <button id="applyTemplate" class="btn">Apply Changes</button>
+      </div>
+      
+      <div class="panel">
+        <h3>Detected Tokens</h3>
+        <form id="tokenForm" class="token-form">
+          </form>
+      </div>
+
+      <div class="panel">
+        <h3>Rendered Communication</h3>
+        <div class="toolbar">
+          <button id="copyRendered" class="btn">Copy</button>
         </div>
+        <pre id="renderedText" class="rendered" placeholder="Generated text will appear here..."></pre>
+      </div>
+
+      <div class="panel">
+        <h3>Print Preview</h3>
+        <div class="toolbar">
+          <button onclick="window.print()" class="btn">Print to PDF</button>
+        </div>
+        <article id="printPreview" class="preview"></article>
       </div>
     </section>
   </main>
 
   <footer class="app-footer">
-    <span>Business ITA - Local</span>
-    <span>HTML/JS only • Runs offline • Evergreen browsers</span>
+    <span>Business ITA • Runs offline in evergreen browsers</span>
   </footer>
 
   <script src="assets/js/templates.js"></script>
