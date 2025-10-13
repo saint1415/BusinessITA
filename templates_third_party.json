@@ -1,0 +1,97 @@
+{
+  "templatePack": "Third-Party & Vendor Incidents",
+  "version": "1.0.0",
+  "description": "Templates for incidents caused by third-party services, vendors, cloud providers, and supply chain disruptions",
+  "templates": [
+    {
+      "id": "vendor-outage-internal-s0",
+      "name": "Critical Vendor Outage - Internal Responders (S0)",
+      "audience": "Internal",
+      "severity": "S0",
+      "category": "Third-Party",
+      "subject": "🚨 S0: Critical Vendor Outage - {{INCIDENT_NAME}} - {{INCIDENT_ID}}",
+      "body": "**CRITICAL VENDOR OUTAGE**\n\n**Incident:** {{INCIDENT_ID}} - {{INCIDENT_NAME}}\n**Severity:** {{SEVERITY}}\n**Started:** {{START_TIME}}\n**Incident Commander:** {{INCIDENT_COMMANDER}}\n\n**VENDOR DETAILS:**\nVendor: [Vendor Name]\nService Affected: [Service/API/Platform]\nVendor Status Page: [URL]\nVendor Incident ID: [Their reference number]\n\n**IMPACT TO OUR SERVICES:**\n{{IMPACT_SUMMARY}}\n\n**AFFECTED CUSTOMERS:** {{CUSTOMERS_AFFECTED}}\n**ESTIMATED IMPACT:** ${{IMPACT_ESTIMATE}}/hour\n\n**CURRENT STATUS:**\n{{CURRENT_STATUS}}\n\n**VENDOR ETA:** {{ETA_RESOLUTION}}\n\n**OUR RESPONSE:**\n- [ ] Activated incident response\n- [ ] Contacted vendor support (Ticket: [Number])\n- [ ] Escalated to vendor account manager\n- [ ] Evaluating failover options\n- [ ] Customer communications prepared\n\n**WORKAROUNDS:**\n[List any available workarounds or alternative services]\n\n**DEPENDENCIES:**\n[Other services that may be affected]\n\n**NEXT STEPS:**\n1. Monitor vendor status page\n2. Maintain contact with vendor support\n3. Update customers every [frequency]\n4. Prepare post-incident vendor review\n\n**INCIDENT COMMANDER:** {{INCIDENT_COMMANDER}}\n**NEXT UPDATE:** {{NEXT_UPDATE}}\n\n**War Room:** [Bridge/Channel]"
+    },
+    {
+      "id": "vendor-outage-customer-s0",
+      "name": "Vendor Outage - Customer Communication (S0)",
+      "audience": "Customers",
+      "severity": "S0",
+      "category": "Third-Party",
+      "subject": "Service Disruption - {{INCIDENT_NAME}}",
+      "body": "Dear Valued Customer,\n\nWe are currently experiencing a service disruption affecting [specific features/services].\n\n**What's Happening:**\n{{IMPACT_SUMMARY}}\n\nThis issue is caused by an outage at one of our third-party service providers. We are in active communication with them and monitoring their progress closely.\n\n**What's Affected:**\n- [Feature/Service 1]\n- [Feature/Service 2]\n- [Feature/Service 3]\n\n**What's Working:**\n- [Unaffected features]\n- [Alternative access methods if available]\n\n**Current Status:**\n{{CURRENT_STATUS}}\n\n**Expected Resolution:**\nOur vendor estimates service will be restored by {{ETA_RESOLUTION}}. We will provide updates every [frequency] or sooner if the situation changes.\n\n**What You Can Do:**\n[Workarounds or alternative options if available]\n\n**Next Update:** {{NEXT_UPDATE}}\n\n**Status Page:** {{STATUS_PAGE_URL}}\n\nWe apologize for this disruption and appreciate your patience as we work with our vendor to resolve this issue.\n\nThank you,\n[Company Name] Team"
+    },
+    {
+      "id": "cloud-provider-outage-internal-s0",
+      "name": "Cloud Provider Outage - Internal Responders (S0)",
+      "audience": "Internal",
+      "severity": "S0",
+      "category": "Third-Party",
+      "subject": "🚨 Cloud Provider Outage: {{INCIDENT_NAME}} - {{INCIDENT_ID}}",
+      "body": "**CLOUD PROVIDER OUTAGE - IMMEDIATE RESPONSE REQUIRED**\n\n**Incident:** {{INCIDENT_ID}} - {{INCIDENT_NAME}}\n**Severity:** S0 (Critical)\n**Started:** {{START_TIME}}\n**Incident Commander:** {{INCIDENT_COMMANDER}}\n\n**CLOUD PROVIDER DETAILS:**\nProvider: [AWS/Azure/GCP/Other]\nRegion(s) Affected: [Region codes]\nServices Affected: [EC2/RDS/S3/etc.]\nProvider Status: [URL to their status page]\nProvider Incident: [Their incident ID]\n\n**IMPACT TO OUR INFRASTRUCTURE:**\n{{IMPACT_SUMMARY}}\n\n**AFFECTED SERVICES:**\n- [Service 1] - [Status]\n- [Service 2] - [Status]\n- [Service 3] - [Status]\n\n**CUSTOMERS AFFECTED:** {{CUSTOMERS_AFFECTED}}\n**ESTIMATED IMPACT:** ${{IMPACT_ESTIMATE}}/hour\n\n**CURRENT STATUS:**\n{{CURRENT_STATUS}}\n\n**FAILOVER OPTIONS:**\n- [ ] Multi-region failover: [Available/Not Available/In Progress]\n- [ ] DR site activation: [Available/Not Available/In Progress]\n- [ ] Degraded mode operation: [Available/Not Available/In Progress]\n\n**IMMEDIATE ACTIONS:**\n1. Monitor cloud provider status page continuously\n2. Assess failover feasibility and impact\n3. Prepare customer communications\n4. Document all provider updates for post-incident review\n5. Evaluate SLA credit eligibility\n\n**PROVIDER ETA:** {{ETA_RESOLUTION}}\n\n**ESCALATION:**\n- Cloud Provider Support: [Ticket/Case number]\n- Account Manager: [Name, contacted Y/N]\n- TAM (if applicable): [Name, contacted Y/N]\n\n**NEXT UPDATE:** {{NEXT_UPDATE}}\n**WAR ROOM:** [Bridge/Channel]\n\n**INCIDENT COMMANDER:** {{INCIDENT_COMMANDER}}"
+    },
+    {
+      "id": "payment-provider-outage-customer-s1",
+      "name": "Payment Provider Outage - Customer Notice (S1)",
+      "audience": "Customers",
+      "severity": "S1",
+      "category": "Third-Party",
+      "subject": "Payment Processing Temporarily Unavailable",
+      "body": "Dear Valued Customer,\n\nWe want to inform you that payment processing is temporarily unavailable due to an issue with our payment provider.\n\n**What's Affected:**\n- Credit card payments\n- [Other payment methods if applicable]\n\n**What's NOT Affected:**\n- Your existing service/access continues uninterrupted\n- Your account and billing information remain secure\n- [Alternative payment methods if available]\n\n**Current Status:**\n{{CURRENT_STATUS}}\n\nOur payment provider is actively working to resolve this issue. We expect payment processing to resume by {{ETA_RESOLUTION}}.\n\n**What This Means for You:**\n- If you were trying to make a payment, please try again later\n- Scheduled automatic payments may be delayed\n- No late fees will be applied due to this outage\n- Your service will not be interrupted\n\n**Alternative Options:**\n[If applicable: wire transfer, check, alternative payment processor]\n\n**Next Update:** {{NEXT_UPDATE}}\n\nWe apologize for any inconvenience and appreciate your patience.\n\nBest regards,\n[Company Name] Team\n\n**Questions?** Contact support: {{CONTACT_POINT}}"
+    },
+    {
+      "id": "auth-provider-outage-internal-s0",
+      "name": "Authentication Provider Outage - Internal (S0)",
+      "audience": "Internal",
+      "severity": "S0",
+      "category": "Third-Party",
+      "subject": "🚨 CRITICAL: Auth Provider Outage - Users Cannot Login - {{INCIDENT_ID}}",
+      "body": "**CRITICAL AUTHENTICATION OUTAGE**\n\n**Incident:** {{INCIDENT_ID}} - {{INCIDENT_NAME}}\n**Severity:** S0 (Critical)\n**Started:** {{START_TIME}}\n**Incident Commander:** {{INCIDENT_COMMANDER}}\n\n**AUTH PROVIDER:**\nProvider: [Auth0/Okta/Azure AD/Other]\nStatus Page: [URL]\nProvider Incident: [Their reference]\n\n**IMPACT:**\n{{IMPACT_SUMMARY}}\n\n**USER IMPACT:**\n- New logins: BLOCKED\n- Existing sessions: [Active/Expiring]\n- SSO integrations: [Affected/Not Affected]\n- API authentication: [Affected/Not Affected]\n\n**CUSTOMERS AFFECTED:** {{CUSTOMERS_AFFECTED}}\n\n**CURRENT STATUS:**\n{{CURRENT_STATUS}}\n\n**IMMEDIATE ACTIONS:**\n\n**Engineering:**\n- [ ] Extend existing session timeouts (if possible)\n- [ ] Evaluate emergency bypass authentication\n- [ ] Monitor for cascading failures\n- [ ] Prepare rollback to backup auth if available\n\n**Support:**\n- [ ] Prepare customer communications\n- [ ] Update status page\n- [ ] Prepare support macros\n- [ ] Monitor support queue\n\n**Leadership:**\n- [ ] Assess business impact\n- [ ] Approve emergency measures if needed\n- [ ] Prepare vendor escalation\n\n**WORKAROUNDS:**\n[List any emergency access procedures]\n\n**PROVIDER ETA:** {{ETA_RESOLUTION}}\n\n**ESCALATION PATH:**\n- Support Ticket: [Number]\n- Account Manager: [Name/Status]\n- Emergency Hotline: [Called Y/N]\n\n**NEXT UPDATE:** {{NEXT_UPDATE}}\n**WAR ROOM:** [Bridge/Channel]\n\n**INCIDENT COMMANDER:** {{INCIDENT_COMMANDER}}"
+    },
+    {
+      "id": "cdn-outage-internal-s1",
+      "name": "CDN Provider Outage - Internal Responders (S1)",
+      "audience": "Internal",
+      "severity": "S1",
+      "category": "Third-Party",
+      "subject": "CDN Outage: {{INCIDENT_NAME}} - {{INCIDENT_ID}}",
+      "body": "**CDN PROVIDER OUTAGE**\n\n**Incident:** {{INCIDENT_ID}} - {{INCIDENT_NAME}}\n**Severity:** S1 (High)\n**Started:** {{START_TIME}}\n**Incident Commander:** {{INCIDENT_COMMANDER}}\n\n**CDN PROVIDER:**\nProvider: [Cloudflare/Fastly/Akamai/Other]\nAffected POPs: [Geographic regions]\nProvider Status: [URL]\n\n**IMPACT:**\n{{IMPACT_SUMMARY}}\n\n**AFFECTED CONTENT:**\n- Static assets: [Images/CSS/JS]\n- API endpoints: [If CDN-proxied]\n- Geographic regions: [List]\n\n**USER EXPERIENCE:**\n- Slow page loads\n- Missing images/styling\n- [Other symptoms]\n\n**CURRENT STATUS:**\n{{CURRENT_STATUS}}\n\n**MITIGATION OPTIONS:**\n- [ ] Failover to backup CDN: [Available/In Progress/Not Available]\n- [ ] Serve directly from origin: [Feasible Y/N]\n- [ ] Reduce asset sizes: [In Progress/Not Applicable]\n- [ ] Geographic routing changes: [In Progress/Not Applicable]\n\n**MONITORING:**\n- Origin server load: [Status]\n- Bandwidth utilization: [Status]\n- Error rates: [Percentage]\n\n**PROVIDER ETA:** {{ETA_RESOLUTION}}\n\n**NEXT STEPS:**\n1. Monitor provider status updates\n2. Assess need for customer communication\n3. Prepare post-incident CDN architecture review\n4. Document for SLA credit claim\n\n**INCIDENT COMMANDER:** {{INCIDENT_COMMANDER}}\n**NEXT UPDATE:** {{NEXT_UPDATE}}"
+    },
+    {
+      "id": "vendor-data-breach-internal-s0",
+      "name": "Vendor Data Breach Notification - Internal (S0)",
+      "audience": "Internal",
+      "severity": "S0",
+      "category": "Third-Party",
+      "subject": "🚨 URGENT: Vendor Data Breach - {{INCIDENT_NAME}} - {{INCIDENT_ID}}",
+      "body": "**VENDOR DATA BREACH NOTIFICATION**\n\n**Incident:** {{INCIDENT_ID}} - {{INCIDENT_NAME}}\n**Severity:** S0 (Critical)\n**Notified:** {{START_TIME}}\n**Incident Commander:** {{INCIDENT_COMMANDER}}\n\n**VENDOR DETAILS:**\nVendor: [Vendor Name]\nVendor Contact: [Name/Email/Phone]\nVendor Incident ID: [Their reference]\n\n**BREACH DETAILS (as reported by vendor):**\n{{IMPACT_SUMMARY}}\n\n**OUR DATA AT RISK:**\n- Data types: [Customer PII/Financial/Health/etc.]\n- Records affected: {{CUSTOMERS_AFFECTED}}\n- Data classification: [Public/Internal/Confidential/Restricted]\n\n**IMMEDIATE ACTIONS REQUIRED:**\n\n**Legal:**\n- [ ] Review vendor contract and liability\n- [ ] Assess notification obligations (GDPR/CCPA/etc.)\n- [ ] Determine regulatory reporting requirements\n- [ ] Preserve all vendor communications\n\n**Security:**\n- [ ] Revoke vendor API keys/access\n- [ ] Review vendor access logs\n- [ ] Assess if our systems are at risk\n- [ ] Request vendor forensic report\n\n**Privacy/Compliance:**\n- [ ] Assess data subject impact\n- [ ] Determine notification requirements\n- [ ] Prepare breach notification templates\n- [ ] Coordinate with DPO\n\n**Communications:**\n- [ ] Prepare customer notification (if required)\n- [ ] Prepare regulator notification (if required)\n- [ ] Prepare internal FAQ\n- [ ] Media monitoring\n\n**CURRENT STATUS:**\n{{CURRENT_STATUS}}\n\n**VENDOR RESPONSE:**\n- Containment: [Status]\n- Investigation: [Status]\n- Remediation: [Status]\n- Their customer notifications: [Status]\n\n**OUR TIMELINE:**\n- Legal assessment: [Deadline]\n- Notification decision: [Deadline]\n- Customer notification (if req'd): [Deadline]\n- Regulator notification (if req'd): [Deadline]\n\n**JURISDICTION:** {{JURISDICTION}}\n\n**INCIDENT COMMANDER:** {{INCIDENT_COMMANDER}}\n**NEXT UPDATE:** {{NEXT_UPDATE}}\n\n**CONFIDENTIAL - ATTORNEY-CLIENT PRIVILEGED**"
+    },
+    {
+      "id": "dns-provider-outage-internal-s0",
+      "name": "DNS Provider Outage - Internal Responders (S0)",
+      "audience": "Internal",
+      "severity": "S0",
+      "category": "Third-Party",
+      "subject": "🚨 DNS OUTAGE: Services Unreachable - {{INCIDENT_ID}}",
+      "body": "**CRITICAL DNS PROVIDER OUTAGE**\n\n**Incident:** {{INCIDENT_ID}} - {{INCIDENT_NAME}}\n**Severity:** S0 (Critical)\n**Started:** {{START_TIME}}\n**Incident Commander:** {{INCIDENT_COMMANDER}}\n\n**DNS PROVIDER:**\nProvider: [Route53/Cloudflare/NS1/Other]\nAffected Zones: [List domains]\nProvider Status: [URL]\n\n**IMPACT:**\n{{IMPACT_SUMMARY}}\n\n**SYMPTOMS:**\n- Domain resolution failures\n- Services unreachable by domain name\n- Email delivery issues\n- SSL/TLS certificate validation failures\n\n**AFFECTED SERVICES:**\n- [Service 1] - [Impact]\n- [Service 2] - [Impact]\n- [Service 3] - [Impact]\n\n**CURRENT STATUS:**\n{{CURRENT_STATUS}}\n\n**IMMEDIATE ACTIONS:**\n\n**Infrastructure:**\n- [ ] Verify secondary DNS providers are responding\n- [ ] Check TTL values on critical records\n- [ ] Prepare to switch to backup DNS provider\n- [ ] Document current DNS configuration\n\n**Communications:**\n- [ ] Update status page (if reachable)\n- [ ] Use alternative channels (social media, email)\n- [ ] Prepare customer communications\n\n**WORKAROUNDS:**\n- Direct IP access: [Available Y/N - IPs: ]\n- Alternative domains: [If available]\n- VPN access: [If applicable]\n\n**DNS FAILOVER:**\n- Secondary provider: [Name/Status]\n- Failover process: [Manual/Automatic]\n- ETA to failover: [Time estimate]\n\n**PROVIDER ETA:** {{ETA_RESOLUTION}}\n\n**NEXT UPDATE:** {{NEXT_UPDATE}}\n**WAR ROOM:** [Bridge/Channel]\n\n**INCIDENT COMMANDER:** {{INCIDENT_COMMANDER}}\n\n**NOTE:** DNS changes may take up to [TTL] to propagate globally."
+    },
+    {
+      "id": "vendor-degradation-customer-s2",
+      "name": "Vendor Service Degradation - Customer Notice (S2)",
+      "audience": "Customers",
+      "severity": "S2",
+      "category": "Third-Party",
+      "subject": "Service Performance Notice - {{INCIDENT_NAME}}",
+      "body": "Dear Valued Customer,\n\nWe want to inform you of a performance issue affecting some features of our service.\n\n**What's Happening:**\n{{IMPACT_SUMMARY}}\n\nThis is due to performance issues at one of our third-party service providers. We are working closely with them to resolve this.\n\n**What You Might Experience:**\n- Slower than normal response times\n- Intermittent timeouts\n- [Other symptoms]\n\n**What's NOT Affected:**\n- [Core features that are working normally]\n- Your data remains secure and accessible\n\n**Current Status:**\n{{CURRENT_STATUS}}\n\n**Expected Resolution:**\n{{ETA_RESOLUTION}}\n\n**What We're Doing:**\n- Monitoring the situation closely\n- Working with our vendor to expedite resolution\n- Implementing temporary optimizations where possible\n\n**What You Can Do:**\n- [Workarounds or tips if available]\n- Avoid [specific actions that might timeout]\n- Retry failed operations after a few minutes\n\n**Next Update:** {{NEXT_UPDATE}}\n\nWe apologize for any inconvenience and appreciate your patience.\n\nBest regards,\n[Company Name] Team\n\n**Status Page:** {{STATUS_PAGE_URL}}"
+    },
+    {
+      "id": "vendor-resolved-internal",
+      "name": "Vendor Incident Resolved - Internal Debrief (All Severities)",
+      "audience": "Internal",
+      "severity": "S0",
+      "category": "Third-Party",
+      "subject": "RESOLVED: {{INCIDENT_NAME}} - Post-Incident Actions Required",
+      "body": "**VENDOR INCIDENT RESOLVED**\n\n**Incident:** {{INCIDENT_ID}} - {{INCIDENT_NAME}}\n**Resolved:** [Resolution timestamp]\n**Duration:** [Total duration]\n**Incident Commander:** {{INCIDENT_COMMANDER}}\n\n**FINAL STATUS:**\n{{CURRENT_STATUS}}\n\n**ROOT CAUSE (per vendor):**\n{{ROOT_CAUSE}}\n\n**IMPACT SUMMARY:**\n- Customers affected: {{CUSTOMERS_AFFECTED}}\n- Revenue impact: ${{IMPACT_ESTIMATE}} (total)\n- Duration: [Hours/Minutes]\n- Services affected: [List]\n\n**VENDOR RESPONSE ASSESSMENT:**\n- Time to acknowledge: [Duration]\n- Time to resolution: [Duration]\n- Communication quality: [Rating/Notes]\n- Transparency: [Rating/Notes]\n\n**REQUIRED POST-INCIDENT ACTIONS:**\n\n**Immediate (24 hours):**\n- [ ] Customer resolution notification\n- [ ] Update status page to resolved\n- [ ] Close incident ticket\n- [ ] Document timeline and impact\n\n**Short-term (1 week):**\n- [ ] Request vendor RCA report\n- [ ] Assess SLA credit eligibility\n- [ ] Review vendor contract terms\n- [ ] Update runbooks based on learnings\n\n**Medium-term (1 month):**\n- [ ] Vendor performance review meeting\n- [ ] Evaluate redundancy/failover options\n- [ ] Update vendor risk assessment\n- [ ] Consider alternative vendors\n\n**LESSONS LEARNED:**\n- What went well: [List]\n- What could improve: [List]\n- Action items: [List with owners]\n\n**VENDOR ACCOUNTABILITY:**\n- SLA credits due: [Amount/Status]\n- Contractual remedies: [Available options]\n- Escalation to vendor executive: [Required Y/N]\n\n**POST-INCIDENT REVIEW:**\nScheduled: [Date/Time]\nAttendees: [List]\nAgenda: [Link]\n\n**INCIDENT COMMANDER:** {{INCIDENT_COMMANDER}}\n\n**All teams:** Please add your observations and action items to the post-incident review doc: [LINK]"
+    }
+  ]
+}
