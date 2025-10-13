@@ -13,21 +13,28 @@
     // ========================================
     const themeToggle = document.getElementById("themeToggle");
     if (themeToggle) {
-      themeToggle.addEventListener("click", (e) => {
+      themeToggle.addEventListener("click", function(e) {
         e.preventDefault();
-        const current = document.documentElement.getAttribute("data-theme");
+        e.stopPropagation();
+        
+        const current = document.documentElement.getAttribute("data-theme") || "light";
         const next = current === "light" ? "dark" : "light";
         
-        // Save to localStorage
-        try {
-          localStorage.setItem('bita_theme', next);
-          console.log('Theme saved to localStorage:', next);
-        } catch (err) {
-          console.error('Failed to save theme:', err);
-        }
+        console.log('Toggling theme from', current, 'to', next);
         
-        // Apply theme
-        setTheme(next);
+        // Save to localStorage FIRST
+        localStorage.setItem('bita_theme', next);
+        
+        // Verify it saved
+        const saved = localStorage.getItem('bita_theme');
+        console.log('Theme saved to localStorage:', saved);
+        
+        // Apply theme to DOM
+        document.documentElement.setAttribute("data-theme", next);
+        window.BITA_STORE.theme = next;
+        
+        // Update button text
+        themeToggle.textContent = next === "light" ? "🌙 Dark" : "☀️ Light";
       });
     }
 
