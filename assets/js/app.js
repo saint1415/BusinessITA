@@ -8,35 +8,18 @@
     bindIncidentFields();
     populateTemplateList();
 
-    // ========================================
-    // Theme Toggle
-    // ========================================
-    const themeToggle = document.getElementById("themeToggle");
-    if (themeToggle) {
-      themeToggle.addEventListener("click", function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        
-        const current = document.documentElement.getAttribute("data-theme") || "light";
-        const next = current === "light" ? "dark" : "light";
-        
-        console.log('Toggling theme from', current, 'to', next);
-        
-        // Save to localStorage FIRST
-        localStorage.setItem('bita_theme', next);
-        
-        // Verify it saved
-        const saved = localStorage.getItem('bita_theme');
-        console.log('Theme saved to localStorage:', saved);
-        
-        // Apply theme to DOM
-        document.documentElement.setAttribute("data-theme", next);
-        window.BITA_STORE.theme = next;
-        
-        // Update button text
-        themeToggle.textContent = next === "light" ? "🌙 Dark" : "☀️ Light";
-      });
-    }
+// ========================================
+// Theme Toggle
+// ========================================
+const themeToggle = document.getElementById("themeToggle");
+if (themeToggle) {
+  themeToggle.addEventListener("click", function(e) {
+    e.preventDefault();
+    const current = document.documentElement.getAttribute("data-theme") || "light";
+    const next = current === "light" ? "dark" : "light";
+    setTheme(next); // Use the existing setTheme function from ui.js
+  });
+}
 
     // ========================================
     // Tab Navigation
