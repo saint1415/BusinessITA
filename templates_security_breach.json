@@ -1,0 +1,97 @@
+{
+  "templatePack": "Security Incidents",
+  "version": "1.0.0",
+  "description": "Templates for cybersecurity incidents including data breaches, ransomware, and unauthorized access",
+  "templates": [
+    {
+      "id": "sec-breach-internal-s0",
+      "name": "Security Breach - Internal Responders (S0)",
+      "audience": "Internal",
+      "severity": "S0",
+      "category": "Security",
+      "subject": "🚨 S0 SECURITY INCIDENT: {{INCIDENT_NAME}} - {{INCIDENT_ID}}",
+      "body": "**IMMEDIATE ACTION REQUIRED**\n\n**Incident:** {{INCIDENT_ID}} - {{INCIDENT_NAME}}\n**Severity:** {{SEVERITY}}\n**Detected:** {{START_TIME}}\n**Incident Commander:** {{INCIDENT_COMMANDER}}\n\n**SITUATION:**\n{{IMPACT_SUMMARY}}\n\n**IMMEDIATE ACTIONS:**\n- All hands on deck - join war room immediately\n- Preserve all logs and forensic evidence\n- Do NOT reboot affected systems without IC approval\n- Activate incident response playbook\n- Legal and Security teams notified\n\n**CURRENT STATUS:**\n{{CURRENT_STATUS}}\n\n**NEXT UPDATE:** {{NEXT_UPDATE}}\n\n**War Room:** [Insert bridge/Slack channel]\n**Incident Commander:** {{INCIDENT_COMMANDER}}\n\n**CONFIDENTIAL - DO NOT FORWARD**"
+    },
+    {
+      "id": "sec-breach-exec-s0",
+      "name": "Security Breach - Executive Leadership (S0)",
+      "audience": "Executive",
+      "severity": "S0",
+      "category": "Security",
+      "subject": "URGENT: Security Incident {{INCIDENT_ID}} - Executive Briefing",
+      "body": "**EXECUTIVE SUMMARY**\n\n**Incident:** {{INCIDENT_NAME}}\n**Severity:** S0 (Critical)\n**Time Detected:** {{START_TIME}}\n\n**BUSINESS IMPACT:**\n{{IMPACT_SUMMARY}}\n\n**Customers Affected:** {{CUSTOMERS_AFFECTED}}\n**Estimated Impact:** ${{IMPACT_ESTIMATE}}/hour\n\n**CURRENT STATUS:**\n{{CURRENT_STATUS}}\n\n**ROOT CAUSE:** {{ROOT_CAUSE}}\n\n**REGULATORY CONSIDERATIONS:**\n- Jurisdiction: {{JURISDICTION}}\n- Notification requirements being assessed by Legal\n- Timeline for regulatory reporting: [Legal to advise]\n\n**NEXT STEPS:**\n1. Containment and eradication in progress\n2. Forensic investigation underway\n3. Customer communication plan being prepared\n4. Legal reviewing notification obligations\n\n**INCIDENT COMMANDER:** {{INCIDENT_COMMANDER}}\n**NEXT EXECUTIVE UPDATE:** {{NEXT_UPDATE}}\n\n**CONFIDENTIAL & PRIVILEGED**"
+    },
+    {
+      "id": "sec-breach-customer-s0-initial",
+      "name": "Security Breach - Customer Initial Notice (S0)",
+      "audience": "Customers",
+      "severity": "S0",
+      "category": "Security",
+      "subject": "Important Security Notice - {{INCIDENT_NAME}}",
+      "body": "Dear Valued Customer,\n\nWe are writing to inform you of a security incident that may affect your account.\n\n**What Happened:**\n{{IMPACT_SUMMARY}}\n\n**What We're Doing:**\n{{CURRENT_STATUS}}\n\nWe are working with cybersecurity experts and law enforcement to investigate this incident and protect your information.\n\n**What You Should Do:**\n- Change your password immediately\n- Enable two-factor authentication if not already active\n- Monitor your account for unusual activity\n- Be alert for phishing attempts\n\n**What Information May Be Affected:**\n[Specify: names, email addresses, encrypted passwords, payment info, etc.]\n\n**Next Steps:**\nWe will provide updates as we learn more. Our next update will be by {{NEXT_UPDATE}}.\n\n**Questions?**\nContact our security team at {{CONTACT_POINT}}\n\nWe sincerely apologize for this incident and any concern it may cause. The security of your information is our top priority.\n\nSincerely,\n[Company Name] Security Team"
+    },
+    {
+      "id": "sec-breach-regulator-gdpr",
+      "name": "Security Breach - GDPR Regulator Notification",
+      "audience": "Regulators",
+      "severity": "S0",
+      "category": "Security",
+      "subject": "Personal Data Breach Notification - {{INCIDENT_ID}}",
+      "body": "**PERSONAL DATA BREACH NOTIFICATION**\n**Pursuant to GDPR Article 33**\n\n**1. BREACH DETAILS**\nIncident Reference: {{INCIDENT_ID}}\nDate/Time of Breach: {{START_TIME}}\nDate/Time Discovered: [Insert discovery time]\nOrganization: [Company Legal Name]\nData Protection Officer: {{CONTACT_POINT}}\n\n**2. NATURE OF THE BREACH**\n{{IMPACT_SUMMARY}}\n\n**3. CATEGORIES AND APPROXIMATE NUMBER OF DATA SUBJECTS AFFECTED**\nData Subjects Affected: {{CUSTOMERS_AFFECTED}}\nCategories: [e.g., customers, employees, contractors]\nGeographic Scope: [EU member states affected]\n\n**4. CATEGORIES AND APPROXIMATE NUMBER OF PERSONAL DATA RECORDS AFFECTED**\nRecords Affected: [Number]\nData Categories:\n- [e.g., Names, email addresses]\n- [e.g., Encrypted passwords]\n- [e.g., Transaction history]\n- [Special category data, if any]\n\n**5. LIKELY CONSEQUENCES OF THE BREACH**\n{{CURRENT_STATUS}}\n\nRisk Assessment:\n- Identity theft risk: [Low/Medium/High]\n- Financial fraud risk: [Low/Medium/High]\n- Reputational damage: [Low/Medium/High]\n\n**6. MEASURES TAKEN OR PROPOSED**\nImmediate Actions:\n{{CURRENT_STATUS}}\n\nPreventive Measures:\n- [Technical measures implemented]\n- [Organizational measures implemented]\n- [Monitoring and detection improvements]\n\n**7. COMMUNICATION TO DATA SUBJECTS**\nData subjects notified: [Yes/No/In Progress]\nNotification method: [Email/Direct mail/Website]\nNotification date: [Date or planned date]\n\n**8. CONTACT INFORMATION**\nData Protection Officer: {{CONTACT_POINT}}\nIncident Commander: {{INCIDENT_COMMANDER}}\n\n**9. NEXT STEPS**\nNext update to supervisory authority: {{NEXT_UPDATE}}\n\n**CONFIDENTIAL**"
+    },
+    {
+      "id": "sec-ransomware-internal-s0",
+      "name": "Ransomware Attack - Internal Responders (S0)",
+      "audience": "Internal",
+      "severity": "S0",
+      "category": "Security",
+      "subject": "🚨 RANSOMWARE INCIDENT: {{INCIDENT_NAME}} - {{INCIDENT_ID}}",
+      "body": "**CRITICAL SECURITY INCIDENT - RANSOMWARE DETECTED**\n\n**Incident:** {{INCIDENT_ID}} - {{INCIDENT_NAME}}\n**Detected:** {{START_TIME}}\n**Incident Commander:** {{INCIDENT_COMMANDER}}\n\n**IMMEDIATE ACTIONS - DO NOW:**\n1. **DO NOT** pay ransom without executive and legal approval\n2. **ISOLATE** affected systems - disconnect from network\n3. **PRESERVE** evidence - do not delete or modify files\n4. **DOCUMENT** everything - screenshots, logs, ransom notes\n5. Join war room immediately: [Bridge/Channel]\n\n**SITUATION:**\n{{IMPACT_SUMMARY}}\n\n**AFFECTED SYSTEMS:**\n[List affected systems/services]\n\n**CURRENT STATUS:**\n{{CURRENT_STATUS}}\n\n**DO NOT:**\n- Reboot affected systems\n- Delete ransom notes or files\n- Communicate with threat actors without IC approval\n- Discuss externally or on social media\n\n**RESPONSE TEAM:**\n- Incident Commander: {{INCIDENT_COMMANDER}}\n- Security Lead: [Name]\n- Legal: [Name]\n- Forensics: [External firm if engaged]\n- Law Enforcement: [FBI/Local - if notified]\n\n**NEXT UPDATE:** {{NEXT_UPDATE}}\n\n**CONFIDENTIAL - ATTORNEY-CLIENT PRIVILEGED**"
+    },
+    {
+      "id": "sec-unauthorized-access-internal-s1",
+      "name": "Unauthorized Access - Internal Responders (S1)",
+      "audience": "Internal",
+      "severity": "S1",
+      "category": "Security",
+      "subject": "Security Alert: Unauthorized Access Detected - {{INCIDENT_ID}}",
+      "body": "**SECURITY INCIDENT NOTIFICATION**\n\n**Incident:** {{INCIDENT_ID}} - {{INCIDENT_NAME}}\n**Severity:** S1 (High)\n**Detected:** {{START_TIME}}\n**Incident Commander:** {{INCIDENT_COMMANDER}}\n\n**SITUATION:**\n{{IMPACT_SUMMARY}}\n\n**WHAT WE KNOW:**\n- Unauthorized access detected to: [System/Service]\n- Access method: [Compromised credentials/Vulnerability/Unknown]\n- Data accessed: [Under investigation/Known scope]\n- Attacker activity: [Describe observed behavior]\n\n**CONTAINMENT ACTIONS:**\n{{CURRENT_STATUS}}\n\n**REQUIRED ACTIONS:**\n- All users: Reset passwords for [affected systems]\n- Admins: Review access logs for [time period]\n- Security: Monitor for lateral movement\n- IT: Patch [specific vulnerability] if applicable\n\n**ROOT CAUSE:** {{ROOT_CAUSE}}\n\n**NEXT STEPS:**\n1. Complete forensic analysis\n2. Verify no data exfiltration\n3. Implement additional monitoring\n4. Assess notification requirements\n\n**INCIDENT COMMANDER:** {{INCIDENT_COMMANDER}}\n**NEXT UPDATE:** {{NEXT_UPDATE}}\n\n**CONFIDENTIAL**"
+    },
+    {
+      "id": "sec-breach-customer-followup",
+      "name": "Security Breach - Customer Follow-up (All Severities)",
+      "audience": "Customers",
+      "severity": "S0",
+      "category": "Security",
+      "subject": "Security Incident Update - {{INCIDENT_NAME}}",
+      "body": "Dear Valued Customer,\n\nWe are writing to provide an update on the security incident we notified you about on [DATE].\n\n**What We've Learned:**\n{{CURRENT_STATUS}}\n\n**Root Cause:**\n{{ROOT_CAUSE}}\n\n**Data Affected:**\n[Specific data types confirmed to be affected]\n\n**What We've Done:**\n- [Security measure 1]\n- [Security measure 2]\n- [Security measure 3]\n- Engaged third-party cybersecurity experts\n- Notified law enforcement\n\n**What You Should Do:**\nIf you haven't already:\n- Change your password\n- Enable two-factor authentication\n- Review your account activity\n- Monitor for suspicious emails or calls\n\n**Additional Protection:**\nWe are providing [12 months of credit monitoring/identity protection] at no cost to affected customers. Details on enrollment: [LINK]\n\n**Timeline:**\n- Incident detected: {{START_TIME}}\n- Containment completed: [DATE]\n- Investigation ongoing: Expected completion [DATE]\n\n**Questions?**\nOur dedicated support team is available:\n- Email: {{CONTACT_POINT}}\n- Phone: [Number]\n- FAQ: [LINK]\n\nWe deeply regret this incident and the concern it has caused. We are committed to earning back your trust.\n\nSincerely,\n[Executive Name]\n[Title]\n[Company Name]"
+    },
+    {
+      "id": "sec-breach-media-statement",
+      "name": "Security Breach - Media Statement (S0)",
+      "audience": "Media",
+      "severity": "S0",
+      "category": "Security",
+      "subject": "Media Statement: Security Incident at [Company Name]",
+      "body": "**FOR IMMEDIATE RELEASE**\n\n**[Company Name] Statement on Security Incident**\n\n[CITY, DATE] — [Company Name] today confirmed that it has experienced a security incident affecting [customer/employee/system] data.\n\n**Incident Overview:**\n{{IMPACT_SUMMARY}}\n\n**Response:**\n{{CURRENT_STATUS}}\n\n[Company Name] has engaged leading cybersecurity experts to investigate the incident and is cooperating with law enforcement. The company has implemented additional security measures to protect customer information.\n\n**Customer Impact:**\nApproximately {{CUSTOMERS_AFFECTED}} customers may be affected. The company is notifying affected individuals and providing [credit monitoring/identity protection services] at no cost.\n\n**Statement from Leadership:**\n\"[Quote from CEO/CISO about commitment to security, apology, and actions being taken]\"\n\n**Customer Resources:**\nAffected customers can find more information and support at:\n- Website: {{STATUS_PAGE_URL}}\n- Email: {{CONTACT_POINT}}\n- Phone: [Dedicated hotline]\n\n**Media Contact:**\n[PR Contact Name]\n[Email]\n[Phone]\n\n**About [Company Name]:**\n[Standard boilerplate]\n\n###"
+    },
+    {
+      "id": "sec-phishing-internal-s2",
+      "name": "Phishing Campaign - Internal Alert (S2)",
+      "audience": "Internal",
+      "severity": "S2",
+      "category": "Security",
+      "subject": "⚠️ Security Alert: Active Phishing Campaign Targeting Employees",
+      "body": "**SECURITY ALERT - PHISHING CAMPAIGN DETECTED**\n\n**Incident:** {{INCIDENT_ID}} - {{INCIDENT_NAME}}\n**Severity:** S2 (Medium)\n**Detected:** {{START_TIME}}\n\n**THREAT OVERVIEW:**\n{{IMPACT_SUMMARY}}\n\n**WHAT TO LOOK FOR:**\n- Sender: [Spoofed email addresses]\n- Subject lines: [Examples]\n- Content: [Description of phishing lure]\n- Links: [Malicious domains]\n\n**IF YOU RECEIVED THIS EMAIL:**\n1. **DO NOT** click any links or download attachments\n2. **DO NOT** enter your credentials\n3. Forward to security@company.com\n4. Delete the email\n5. If you clicked or entered credentials, contact Security immediately\n\n**CURRENT STATUS:**\n{{CURRENT_STATUS}}\n\n**PROTECTION MEASURES:**\n- Email filters updated to block this campaign\n- Affected accounts being identified and secured\n- Additional monitoring in place\n\n**REMINDER - SECURITY BEST PRACTICES:**\n- Verify sender before clicking links\n- Hover over links to see true destination\n- Look for urgency or threats (common phishing tactic)\n- When in doubt, contact Security\n\n**Questions?**\nContact Security Team: {{CONTACT_POINT}}\n\n**Incident Commander:** {{INCIDENT_COMMANDER}}\n**Next Update:** {{NEXT_UPDATE}}"
+    },
+    {
+      "id": "sec-vulnerability-internal-s1",
+      "name": "Critical Vulnerability - Internal Responders (S1)",
+      "audience": "Internal",
+      "severity": "S1",
+      "category": "Security",
+      "subject": "🔴 Critical Vulnerability Requires Immediate Patching - {{INCIDENT_ID}}",
+      "body": "**CRITICAL SECURITY VULNERABILITY - IMMEDIATE ACTION REQUIRED**\n\n**Incident:** {{INCIDENT_ID}} - {{INCIDENT_NAME}}\n**Severity:** S1 (High)\n**Discovered:** {{START_TIME}}\n**Incident Commander:** {{INCIDENT_COMMANDER}}\n\n**VULNERABILITY DETAILS:**\n{{IMPACT_SUMMARY}}\n\n**AFFECTED SYSTEMS:**\n[List of affected systems/software/versions]\n\n**RISK:**\n- Exploitability: [Low/Medium/High/Critical]\n- Impact if exploited: [Description]\n- Known exploits: [Yes/No - in the wild?]\n- CVE: [CVE number if applicable]\n\n**REQUIRED ACTIONS BY TEAM:**\n\n**Infrastructure Team:**\n- Patch all affected systems by [DEADLINE]\n- Priority order: [Internet-facing > Internal > Dev]\n- Verify patch deployment\n\n**Security Team:**\n- Monitor for exploitation attempts\n- Scan for indicators of compromise\n- Review logs for [time period]\n\n**Development Team:**\n- Update dependencies in [affected applications]\n- Redeploy with patched versions\n- Test for regressions\n\n**CURRENT STATUS:**\n{{CURRENT_STATUS}}\n\n**PATCHING TIMELINE:**\n- Critical systems: [Deadline]\n- High priority: [Deadline]\n- All systems: [Deadline]\n\n**WORKAROUNDS (if patch not immediately possible):**\n[List temporary mitigations]\n\n**INCIDENT COMMANDER:** {{INCIDENT_COMMANDER}}\n**NEXT UPDATE:** {{NEXT_UPDATE}}\n\n**Questions?** Contact Security: {{CONTACT_POINT}}"
+    }
+  ]
+}
