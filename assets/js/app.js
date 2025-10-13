@@ -13,10 +13,20 @@
     // ========================================
     const themeToggle = document.getElementById("themeToggle");
     if (themeToggle) {
-      themeToggle.addEventListener("click", () => {
+      themeToggle.addEventListener("click", (e) => {
+        e.preventDefault();
         const current = document.documentElement.getAttribute("data-theme");
         const next = current === "light" ? "dark" : "light";
-        localStorage.setItem('bita_theme', next);
+        
+        // Save to localStorage
+        try {
+          localStorage.setItem('bita_theme', next);
+          console.log('Theme saved to localStorage:', next);
+        } catch (err) {
+          console.error('Failed to save theme:', err);
+        }
+        
+        // Apply theme
         setTheme(next);
       });
     }
