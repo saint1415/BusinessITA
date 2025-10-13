@@ -1,0 +1,361 @@
+{
+  "schemaVersion": "1.0.0",
+  "severitySLAs": {
+    "S0": {
+      "name": "Critical",
+      "description": "Complete service outage or critical security breach",
+      "nextUpdateMinutes": 30,
+      "requiredFields": [
+        "incidentId",
+        "name",
+        "startTime",
+        "nextUpdate",
+        "severity",
+        "impactSummary",
+        "customersAffected",
+        "currentStatus",
+        "incidentCommander",
+        "contactPoint"
+      ],
+      "recommendations": [
+        "Notify executives immediately",
+        "Activate war room",
+        "Prepare customer communications within 1 hour",
+        "Consider regulatory notification requirements"
+      ]
+    },
+    "S1": {
+      "name": "High",
+      "description": "Major functionality degraded, significant customer impact",
+      "nextUpdateMinutes": 60,
+      "requiredFields": [
+        "incidentId",
+        "name",
+        "startTime",
+        "nextUpdate",
+        "severity",
+        "impactSummary",
+        "currentStatus",
+        "incidentCommander"
+      ],
+      "recommendations": [
+        "Notify leadership within 30 minutes",
+        "Update customers if impact is visible",
+        "Document timeline for post-incident review"
+      ]
+    },
+    "S2": {
+      "name": "Medium",
+      "description": "Partial service degradation, limited customer impact",
+      "nextUpdateMinutes": 120,
+      "requiredFields": [
+        "incidentId",
+        "name",
+        "startTime",
+        "severity",
+        "impactSummary",
+        "incidentCommander"
+      ],
+      "recommendations": [
+        "Monitor for escalation",
+        "Prepare internal status updates",
+        "Consider proactive customer notification if prolonged"
+      ]
+    },
+    "S3": {
+      "name": "Low",
+      "description": "Minor issue, minimal or no customer impact",
+      "nextUpdateMinutes": 240,
+      "requiredFields": [
+        "incidentId",
+        "name",
+        "severity",
+        "incidentCommander"
+      ],
+      "recommendations": [
+        "Track for patterns",
+        "Document for knowledge base",
+        "No external communication typically required"
+      ]
+    }
+  },
+  "jurisdictions": {
+    "Global": {
+      "description": "Standard incident response with no specific regulatory requirements",
+      "requirements": [],
+      "helpText": "Use for incidents with no specific geographic or regulatory constraints."
+    },
+    "EU (GDPR)": {
+      "description": "European Union - General Data Protection Regulation applies",
+      "requirements": [
+        "Personal data breach must be reported to supervisory authority within 72 hours",
+        "High-risk breaches require notification to affected individuals without undue delay",
+        "Must document: nature of breach, categories/numbers affected, likely consequences, measures taken",
+        "Include Data Protection Officer (DPO) contact in all breach communications"
+      ],
+      "helpText": "GDPR Article 33 & 34 apply. Ensure DPO is notified immediately. Document all breach details.",
+      "mandatoryFields": ["contactPoint"],
+      "timingWarnings": {
+        "72hours": "GDPR requires supervisory authority notification within 72 hours of breach awareness"
+      }
+    },
+    "US": {
+      "description": "United States - State breach notification laws may apply",
+      "requirements": [
+        "Breach notification laws vary by state",
+        "Most states require notification without unreasonable delay",
+        "California (CCPA): 500+ residents requires AG notification",
+        "Consider sector-specific regulations (HIPAA, GLBA, etc.)"
+      ],
+      "helpText": "Check applicable state laws. Consider CCPA, HIPAA, or financial regulations if applicable.",
+      "timingWarnings": {
+        "varies": "State laws vary - consult legal for specific timing requirements"
+      }
+    },
+    "US (SEC)": {
+      "description": "United States - SEC public company disclosure requirements",
+      "requirements": [
+        "Material cybersecurity incidents must be disclosed on Form 8-K within 4 business days",
+        "Materiality determined by impact on financial condition, operations, or reputation",
+        "Annual disclosure of cybersecurity risk management and governance (Form 10-K)",
+        "Coordinate with Legal, Finance, and Investor Relations"
+      ],
+      "helpText": "SEC Rule 17 CFR 229.106 applies. Assess materiality immediately. Involve IR and Legal.",
+      "mandatoryFields": ["impactEstimate"],
+      "timingWarnings": {
+        "4days": "SEC requires Form 8-K filing within 4 business days of materiality determination"
+      }
+    }
+  },
+  "fieldDefinitions": {
+    "incidentId": {
+      "label": "Incident ID",
+      "type": "text",
+      "placeholder": "INC-2025-001",
+      "helpText": "Unique identifier for this incident. Use your org's naming convention.",
+      "validation": {
+        "required": true,
+        "pattern": "^[A-Z0-9-]+$",
+        "maxLength": 50
+      }
+    },
+    "ticketId": {
+      "label": "Ticket ID",
+      "type": "text",
+      "placeholder": "JIRA-12345, ZEN-67890",
+      "helpText": "Link to ticketing system (Jira, ServiceNow, Zendesk, etc.)",
+      "validation": {
+        "maxLength": 100
+      }
+    },
+    "name": {
+      "label": "Incident Name",
+      "type": "text",
+      "placeholder": "API Gateway Outage - US-East Region",
+      "helpText": "Brief, descriptive name. Include affected service/region.",
+      "validation": {
+        "required": true,
+        "minLength": 10,
+        "maxLength": 150
+      }
+    },
+    "impactSummary": {
+      "label": "Impact Summary",
+      "type": "textarea",
+      "placeholder": "Users in US-East region are unable to authenticate. Approximately 15,000 active sessions affected. Workaround: users can switch to EU region via VPN.",
+      "helpText": "1-3 sentences: scope, symptoms, affected geographies, and workarounds if available.",
+      "validation": {
+        "minLength": 20,
+        "maxLength": 1000
+      }
+    },
+    "customersAffected": {
+      "label": "Customers Affected",
+      "type": "number",
+      "placeholder": "1500",
+      "helpText": "Estimated number of unique customers impacted. Use 0 if internal-only.",
+      "validation": {
+        "min": 0,
+        "max": 999999999
+      }
+    },
+    "impactEstimate": {
+      "label": "$ Impact / hr (est.)",
+      "type": "currency",
+      "placeholder": "5000.00",
+      "helpText": "Estimated revenue impact per hour (USD). Include lost sales, SLA credits, operational costs.",
+      "validation": {
+        "min": 0,
+        "max": 99999999.99,
+        "decimals": 2
+      }
+    },
+    "currentStatus": {
+      "label": "Current Status",
+      "type": "textarea",
+      "placeholder": "Engineering has identified a memory leak in API gateway v2.3.1. Rollback to v2.3.0 in progress. ETA 45 minutes.",
+      "helpText": "What is happening right now? What actions are underway?",
+      "validation": {
+        "minLength": 10,
+        "maxLength": 1000
+      }
+    },
+    "rootCauseStatus": {
+      "label": "Root Cause Status",
+      "type": "select",
+      "options": [
+        {
+          "value": "unknown",
+          "label": "Unknown - Investigation not started",
+          "description": "Incident just detected, no investigation yet"
+        },
+        {
+          "value": "investigating",
+          "label": "Investigating",
+          "description": "Actively investigating root cause"
+        },
+        {
+          "value": "suspected",
+          "label": "Suspected",
+          "description": "Have a hypothesis, gathering evidence"
+        },
+        {
+          "value": "identified",
+          "label": "Identified",
+          "description": "Root cause confirmed"
+        },
+        {
+          "value": "mitigated",
+          "label": "Mitigated",
+          "description": "Immediate fix applied, monitoring"
+        },
+        {
+          "value": "resolved",
+          "label": "Resolved",
+          "description": "Permanent fix deployed and verified"
+        }
+      ],
+      "helpText": "Current understanding of what caused this incident.",
+      "validation": {
+        "required": false
+      }
+    },
+    "incidentCommander": {
+      "label": "Incident Commander (IC)",
+      "type": "text",
+      "placeholder": "Jane Doe (jane.doe@company.com)",
+      "helpText": "Person leading the incident response. Include name and contact.",
+      "validation": {
+        "required": true,
+        "maxLength": 200
+      }
+    },
+    "contactPoint": {
+      "label": "Contact Point",
+      "type": "text",
+      "placeholder": "security@company.com, +1-555-0100",
+      "helpText": "Primary contact for external inquiries (email, phone). Required for GDPR incidents.",
+      "validation": {
+        "maxLength": 200
+      }
+    }
+  },
+  "tokenDefinitions": {
+    "INCIDENT_ID": {
+      "description": "Unique incident identifier",
+      "example": "INC-2025-001",
+      "required": true
+    },
+    "INCIDENT_NAME": {
+      "description": "Brief incident name",
+      "example": "API Gateway Outage",
+      "required": true
+    },
+    "SEVERITY": {
+      "description": "Incident severity level",
+      "example": "S0 (Critical)",
+      "required": true
+    },
+    "START_TIME": {
+      "description": "When the incident began",
+      "example": "2025-10-13 14:30 UTC",
+      "required": true
+    },
+    "NEXT_UPDATE": {
+      "description": "When the next update will be provided",
+      "example": "2025-10-13 15:00 UTC",
+      "required": true
+    },
+    "IMPACT_SUMMARY": {
+      "description": "Brief description of customer/business impact",
+      "example": "Users unable to log in to the platform",
+      "required": true
+    },
+    "CUSTOMERS_AFFECTED": {
+      "description": "Number of customers impacted",
+      "example": "~1,500 customers",
+      "required": false
+    },
+    "CURRENT_STATUS": {
+      "description": "What is happening right now",
+      "example": "Engineering is rolling back the deployment",
+      "required": true
+    },
+    "ROOT_CAUSE": {
+      "description": "Known or suspected cause",
+      "example": "Memory leak in API gateway v2.3.1",
+      "required": false
+    },
+    "ETA_RESOLUTION": {
+      "description": "Estimated time to resolution",
+      "example": "Within 2 hours",
+      "required": false
+    },
+    "INCIDENT_COMMANDER": {
+      "description": "Person leading the response",
+      "example": "Jane Doe",
+      "required": true
+    },
+    "CONTACT_POINT": {
+      "description": "Contact for inquiries",
+      "example": "security@company.com",
+      "required": false
+    },
+    "STATUS_PAGE_URL": {
+      "description": "Link to public status page",
+      "example": "https://status.company.com",
+      "required": false
+    },
+    "TICKET_ID": {
+      "description": "Tracking ticket reference",
+      "example": "JIRA-12345",
+      "required": false
+    }
+  },
+  "communicationGuidelines": {
+    "tone": {
+      "internal": "Direct, technical, action-oriented",
+      "executive": "Concise, business-impact focused, decision-ready",
+      "customer": "Empathetic, clear, non-technical, solution-focused",
+      "regulator": "Formal, factual, comprehensive, compliant",
+      "media": "Measured, transparent, brand-protective"
+    },
+    "avoidPhrases": [
+      "We think",
+      "We believe",
+      "Probably",
+      "Maybe",
+      "Should be fixed soon",
+      "Trying to",
+      "Hoping to"
+    ],
+    "preferPhrases": [
+      "We have identified",
+      "We are actively working on",
+      "Expected resolution time",
+      "We will update by [TIME]",
+      "Current status is",
+      "Next steps are"
+    ]
+  }
+}
