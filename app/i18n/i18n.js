@@ -1,1 +1,0 @@
-function I18N(){return (k)=>k;}
