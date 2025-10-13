@@ -193,7 +193,7 @@ function loadHistoryList() {
           ${isLatest ? '<span class="badge">Latest</span>' : ''}
         </div>
         <div class="revision-meta">
-          ${formatDate(date)} · ${rev.user}
+          ${formatDate(date)} • ${rev.user}
         </div>
         <div class="revision-summary">
           ${generateRevisionSummary(rev.data)}
@@ -220,7 +220,7 @@ function generateRevisionSummary(incident) {
   if (incident.name) parts.push(incident.name);
   if (incident.severity) parts.push(incident.severity);
   if (incident.current_status) parts.push(incident.current_status);
-  return parts.join(' · ') || 'No details';
+  return parts.join(' • ') || 'No details';
 }
 
 function formatDate(date) {
@@ -294,7 +294,7 @@ function viewDiff(indexA, indexB) {
   const changeList = Object.entries(diff.changes).map(([field, change]) => {
     return `<li>
       <strong>${field}:</strong><br>
-      <span class="diff-before">− ${change.before || '(empty)'}</span><br>
+      <span class="diff-before">- ${change.before || '(empty)'}</span><br>
       <span class="diff-after">+ ${change.after || '(empty)'}</span>
     </li>`;
   }).join('');
@@ -328,6 +328,7 @@ function exportRevision(index) {
   a.href = URL.createObjectURL(blob);
   a.download = `${revision.incident_id}_rev${revision.revision}.json`;
   a.click();
+  URL.revokeObjectURL(a.href);
 }
 
 // Auto-save revisions when significant changes occur
