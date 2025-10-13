@@ -1,7 +1,54 @@
-function parseMetadataFromRendered(text){const start=text.indexOf("-----BEGIN ITA METADATA-----");const end=text.indexOf("-----END ITA METADATA-----");if(start!==-1&&end!==-1&&end>start){const json=text.substring(start+"-----BEGIN ITA METADATA-----".length,end).trim();try{return JSON.parse(json)}catch(e){console.warn("Failed to parse metadata JSON",e)}}return null}
-function stripMetadata(text){return text.replace(/-----BEGIN ITA METADATA-----[\s\S]*-----END ITA METADATA-----/g,"").trim()}
-function updateIncidentFromRendered(text,currentIncident){const meta=parseMetadataFromRendered(text);if(meta?.incident){const next={...currentIncident,...meta.incident};if(meta._meta?.incident_id) next.incident_id=meta._meta.incident_id; if(meta._meta?.revision!==undefined) next.revision=meta._meta.revision; return {incident:next,source:"metadata"}} const body=stripMetadata(text); const incident={...currentIncident}; const tryExtract=(regexes)=>{for(const r of regexes){const m=body.match(r);if(m&&m[1]) return m[1].trim()} return null}; const impact=tryExtract([/Impact(?: now)?:\s*(.+)$/im,/causing\s+(.+?)\./im]); if(impact) incident.impact_summary=impact; const status=tryExtract([/Status:\s*(.+?)(?:\.|
-)/i]); if(status) incident.current_status=status; const root=tryExtract([/Root cause:\s*(.+?)(?:\.|
-)/i]); if(root) incident.root_cause_status=root; const eta=tryExtract([/ETA:\s*(.+?)(?:\.|
-)/i]); if(eta) incident.eta=eta; return {incident,source:"heuristic"}}
-window.BITA_PARSER={parseMetadataFromRendered,updateIncidentFromRendered,stripMetadata};
+// parser.js - Template Metadata Parsing
+class BITA_Parser {
+    constructor() {
+        this.metadataRegex = /<!--\s*META\s*:\s*({.*?})\s*-->/s;
+    }
+    
+    // Parse template metadata
+    parseMetadata(templateString) {
+        try {
+            const match = templateString.match(this.metadataRegex);
+            if (match) {
+                return JSON.parse(match[1]);
+            }
+            return {};
+        } catch (error) {
+            console.warn('Failed to parse template metadata:', error);
+            return {};
+        }
+    }
+    
+    // Extract tokens from template
+    extractTokens(templateString) {
+        const tokenRegex = /{{(.*?)}}/g;
+        const tokens = [];
+        let match;
+        
+        while ((match = tokenRegex.exec(templateString)) !== null) {
+            tokens.push({
+                full: match[0],
+                key: match[1].trim()
+            });
+        }
+        
+        return tokens;
+    }
+    
+    // Parse template content
+    parseTemplate(templateString) {
+        // Extract metadata
+        const metadata = this.parseMetadata(templateString);
+        
+        // Extract tokens
+        const tokens = this.extractTokens(templateString);
+        
+        // Get content without metadata
+        const content = templateString.replace(this.metadataRegex, '').trim();
+        
+        return {
+            metadata: metadata,
+            tokens: tokens,
+            content: content
+        };
+    }
+}

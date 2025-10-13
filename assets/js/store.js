@@ -1,1 +1,52 @@
-const BITA_STORE={theme:"light",incident:{incident_id:"",revision:"00",name:"",severity:"",start_time:"",next_update_time:"",impact_summary:"",ic_name:"",contact:"",customers_affected:"",dollar_impact_per_hour:"",current_status:"",root_cause_status:"",eta:"",link_status_page:"",jurisdiction:"global",ticket_id:""},templates:JSON.parse(JSON.stringify(window.BITA_TEMPLATES)),rendered:{text:"",meta:{}},selectedTemplate:null,audiencesSelected:[],jurisdictionModules:[]};window.BITA_STORE=BITA_STORE;
+// store.js - Centralized State Management
+class BITA_Store {
+    constructor() {
+        this.state = {
+            theme: 'light',
+            currentTemplate: null,
+            incidentData: {},
+            history: [],
+            settings: {}
+        };
+        
+        this.listeners = [];
+    }
+    
+    // Get state value
+    get(key) {
+        return this.state[key];
+    }
+    
+    // Set state value
+    set(key, value) {
+        this.state[key] = value;
+        this.notifyListeners(key, value);
+    }
+    
+    // Update state with object
+    update(obj) {
+        Object.assign(this.state, obj);
+        this.notifyListeners(null, obj);
+    }
+    
+    // Subscribe to state changes
+    subscribe(listener) {
+        this.listeners.push(listener);
+    }
+    
+    // Notify listeners of state changes
+    notifyListeners(key, value) {
+        for (const listener of this.listeners) {
+            try {
+                listener(key, value);
+            } catch (error) {
+                console.warn('Error in state listener:', error);
+            }
+        }
+    }
+    
+    // Get entire state
+    getState() {
+        return {...this.state};
+    }
+}

@@ -1,5 +1,198 @@
-window.BITA_TEMPLATES={communications:[{id:"internal_declaration",title:"Internal – Declaration",audience:"internal",severity:["S0","S1","S2","S3"],version:"1.0.0",tokens_required:["SEVERITY","INCIDENT_NAME","START_TIME","AFFECTED_SYSTEMS","IMPACT_SUMMARY","IC_NAME","RUNBOOK_LINK","NEXT_UPDATE_TIME"],body:""[SEVERITY] incident declared: [INCIDENT_NAME] at [START_TIME]. Scope: [AFFECTED_SYSTEMS]. Impact: [IMPACT_SUMMARY]. War room: #[channel]. IC: [IC_NAME]. Runbook: [RUNBOOK_LINK]. Next update [NEXT_UPDATE_TIME].""},{id:"internal_checkpoint",title:"Internal – Checkpoint",audience:"internal",severity:["S0","S1","S2"],version:"1.0.0",tokens_required:["CURRENT_STATUS","ROOT_CAUSE_STATUS","IMPACT_SUMMARY","NEXT_UPDATE_TIME","TICKET_ID"],body:""Update [T+hh:mm] – Status: [CURRENT_STATUS]. Hypothesis: [ROOT_CAUSE_STATUS]. Actions: [bullets]. Impact now: [IMPACT_SUMMARY]. Risks/needs: [dependencies]. Next update [NEXT_UPDATE_TIME]. [TICKET_ID]""},{id:"exec_initial",title:"Executive – Initial",audience:"executive",severity:["S0","S1"],version:"1.0.0",tokens_required:["INCIDENT_NAME","START_TIME","AFFECTED_SYSTEMS","IMPACT_SUMMARY","CUSTOMERS_AFFECTED","DOLLAR_IMPACT_PER_HOUR","CURRENT_STATUS","ROOT_CAUSE_STATUS","ETA","NEXT_UPDATE_TIME","IC_NAME","CONTACT"],body:"Subject: [URGENT] [SEVERITY] Incident – [INCIDENT_NAME]
+// templates.js - Core Templates
+class BITA_Templates {
+    constructor() {
+        this.templates = {};
+        this.currentPack = 'core';
+    }
+    
+    // Load all templates
+    loadTemplates() {
+        // Core templates
+        this.templates = {
+            // Service Outage Template
+            'service-outage': {
+                id: 'service-outage',
+                title: 'Service Outage',
+                description: 'Template for service outage incidents',
+                type: 'outage',
+                severity: 'high',
+                body: `<!-- META: {"type": "outage", "severity": "high"} -->
+# Service Outage - {{incident_id}}
 
-Summary: At [START_TIME], we declared [SEVERITY] incident affecting [AFFECTED_SYSTEMS]. Current impact: [IMPACT_SUMMARY] ([CUSTOMERS_AFFECTED], est. $ impact: [$IMPACT]/hr). Status: [CURRENT_STATUS]. Root cause: [ROOT_CAUSE_STATUS]. Next milestone: [ETA]. Decisions needed: [if any]. Next update: [NEXT_UPDATE_TIME]. IC: [IC_NAME], contact [CONTACT]."},{id:"customers_status_initial",title:"Customers – Status Page Initial",audience:"customers",severity:["S0","S1","S2"],version:"1.0.0",tokens_required:["START_TIME","IMPACT_SUMMARY","NEXT_UPDATE_TIME"],body:"Identified: We’re investigating an issue causing [IMPACT_SUMMARY]. Start: [START_TIME]. Next update: [NEXT_UPDATE_TIME]."},{id:"customers_email_proactive",title:"Customers – Proactive Email",audience:"customers",severity:["S0","S1"],version:"1.0.0",tokens_required:["START_TIME","IMPACT_SUMMARY","ETA","LINK_STATUS_PAGE"],body:"Subject: Service update for [Product]
+## Summary
+At {{time}} UTC, we experienced an outage affecting {{service_name}}. Our engineering team is actively working to resolve the issue.
 
-Some customers experienced [IMPACT_SUMMARY] starting [START_TIME]. We’ve [contained/are fixing] the issue. If affected: [steps/alternatives]. ETA: [ETA]. Updates: [LINK_STATUS_PAGE]."},{id:"support_ack",title:"Support – Acknowledgement",audience:"support",severity:["S0","S1","S2","S3"],version:"1.0.0",tokens_required:["IMPACT_SUMMARY","NEXT_UPDATE_TIME","LINK_STATUS_PAGE"],body:"Thanks for reaching out. We’re addressing an incident causing [IMPACT_SUMMARY]. Our status page: [LINK_STATUS_PAGE]. We’ll update by [NEXT_UPDATE_TIME]."}],modules:{jurisdictions:{gdpr:"Legal notice (GDPR): We are evaluating personal data impact and will notify affected data subjects and authorities as required.",ccpa:"Legal notice (CCPA): We are assessing the scope of personal information involved and will provide required notices.",sec:"Legal notice (SEC): We are evaluating materiality and disclosure timing consistent with applicable rules."}}};
+## Impact
+- Services affected: {{affected_services}}
+- Estimated customer impact: {{customer_impact}}
+- Regions affected: {{regions_affected}}
+
+## Current Status
+{{current_status}}
+
+## Next Updates
+We will provide updates every {{update_frequency}} minutes or sooner if there are significant developments.
+
+## Contact
+For urgent inquiries, contact {{contact_info}}`,
+                communications: {
+                    internal: `INTERNAL COMMUNICATION - SERVICE OUTAGE
+
+Incident ID: {{incident_id}}
+Service: {{service_name}}
+Time: {{time}} UTC
+Status: {{current_status}}
+
+Please monitor the incident channel for updates.`,
+                    customer: `CUSTOMER COMMUNICATION - SERVICE OUTAGE
+
+Dear Valued Customer,
+
+We are currently experiencing an outage with {{service_name}}. Our team is working diligently to resolve this issue as quickly as possible.
+
+Impact: {{customer_impact_description}}
+Estimated Resolution: {{estimated_resolution}}
+
+We apologize for any inconvenience this may cause and will provide updates as they become available.
+
+Thank you for your patience.`
+                }
+            },
+            
+            // Performance Degradation Template
+            'performance-degradation': {
+                id: 'performance-degradation',
+                title: 'Performance Degradation',
+                description: 'Template for performance degradation incidents',
+                type: 'degradation',
+                severity: 'medium',
+                body: `<!-- META: {"type": "degradation", "severity": "medium"} -->
+# Performance Degradation - {{incident_id}}
+
+## Summary
+At {{time}} UTC, we observed degraded performance for {{service_name}}. Our engineering team is investigating the issue.
+
+## Impact
+- Services affected: {{affected_services}}
+- Performance metrics: {{performance_metrics}}
+- Regions affected: {{regions_affected}}
+
+## Current Status
+{{current_status}}
+
+## Next Updates
+We will provide updates every {{update_frequency}} minutes or sooner if there are significant developments.
+
+## Contact
+For urgent inquiries, contact {{contact_info}}`,
+                communications: {
+                    internal: `INTERNAL COMMUNICATION - PERFORMANCE DEGRADATION
+
+Incident ID: {{incident_id}}
+Service: {{service_name}}
+Time: {{time}} UTC
+Status: {{current_status}}
+
+Please monitor the incident channel for updates.`,
+                    customer: `CUSTOMER COMMUNICATION - PERFORMANCE DEGRADATION
+
+Dear Valued Customer,
+
+We are currently experiencing degraded performance with {{service_name}}. Our team is working to identify and resolve the issue as quickly as possible.
+
+Impact: {{customer_impact_description}}
+Current Status: {{current_status}}
+
+We apologize for any inconvenience this may cause and will provide updates as they become available.
+
+Thank you for your patience.`
+                }
+            },
+            
+            // Scheduled Maintenance Template
+            'scheduled-maintenance': {
+                id: 'scheduled-maintenance',
+                title: 'Scheduled Maintenance',
+                description: 'Template for scheduled maintenance events',
+                type: 'maintenance',
+                severity: 'low',
+                body: `<!-- META: {"type": "maintenance", "severity": "low"} -->
+# Scheduled Maintenance - {{incident_id}}
+
+## Summary
+At {{start_time}} UTC, we will perform scheduled maintenance on {{service_name}}. This maintenance is expected to complete by {{end_time}} UTC.
+
+## Impact
+- Services affected: {{affected_services}}
+- Expected downtime: {{expected_downtime}}
+- Regions affected: {{regions_affected}}
+
+## Maintenance Details
+{{maintenance_details}}
+
+## Contact
+For urgent inquiries, contact {{contact_info}}`,
+                communications: {
+                    pre_maintenance: `PRE-MAINTENANCE NOTIFICATION
+
+Dear Valued Customer,
+
+This is a notification that we will be performing scheduled maintenance on {{service_name}}.
+
+Maintenance Window: {{start_time}} - {{end_time}} UTC
+Services Affected: {{affected_services}}
+Expected Impact: {{expected_impact}}
+
+We recommend planning accordingly during this maintenance window.
+
+Thank you for your understanding.`,
+                    post_maintenance: `POST-MAINTENANCE NOTIFICATION
+
+Dear Valued Customer,
+
+The scheduled maintenance on {{service_name}} has been completed successfully at {{end_time}} UTC.
+
+Services are now operating normally. No further action is required on your part.
+
+We apologize for any inconvenience this may have caused and thank you for your patience.
+
+Best regards,
+{{company_name}} Team`
+                }
+            }
+        };
+        
+        return this.templates;
+    }
+    
+    // Get template by ID
+    getTemplate(id) {
+        return this.templates[id] || null;
+    }
+    
+    // Get all templates
+    getTemplates() {
+        return {...this.templates};
+    }
+    
+    // Get templates by type
+    getTemplatesByType(type) {
+        const filtered = {};
+        for (const [id, template] of Object.entries(this.templates)) {
+            if (template.type === type) {
+                filtered[id] = template;
+            }
+        }
+        return filtered;
+    }
+    
+    // Add custom template
+    addTemplate(id, template) {
+        this.templates[id] = template;
+    }
+    
+    // Remove template
+    removeTemplate(id) {
+        delete this.templates[id];
+    }
+}

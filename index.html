@@ -1,434 +1,127 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Business ITA - Incident Template Assistant</title>
-  <link rel="icon" href="assets/icons/business-ita.svg" />
-  <link rel="stylesheet" href="assets/css/style.css" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Business Incident Template Assistant</title>
+    <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-
-  <header class="app-header">
-    <div class="brand">
-      <img src="assets/icons/business-ita.svg" alt="Business ITA Logo" class="logo" />
-      <div>
-        <h1>Business ITA</h1>
-        <p class="subtitle">Incident Template Assistant</p>
-      </div>
-    </div>
-    <div class="header-actions">
-      <button id="themeToggle" class="btn" aria-label="Toggle theme">🌓</button>
-
-      <details class="dropdown">
-        <summary class="btn">File</summary>
-        <div class="menu">
-          <button id="saveRevision" class="btn">Save Revision</button>
-          <button id="viewHistory" class="btn">View History</button>
-          <label class="file-btn">
-            <input type="file" id="uploadIncident" accept=".json" />
-            <span class="btn">Open Incident (.json)</span>
-          </label>
+    <header>
+        <div class="container">
+            <h1>Business Incident Template Assistant</h1>
+            <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme">🌓</button>
         </div>
-      </details>
-      
-      <details class="dropdown">
-        <summary class="btn">Download</summary>
-        <div class="menu">
-          <button id="downloadIncident" class="btn">Download Incident (.json)</button>
-          <button id="downloadBundle" class="btn">Download Bundle (.txt)</button>
+    </header>
+
+    <main class="container">
+        <section class="form-section">
+            <h2>Incident Details</h2>
+
+            <div class="form-group">
+                <label for="incidentId">Incident ID</label>
+                <div class="input-group">
+                    <input type="text" id="incidentId" name="incident_id" placeholder="AUTO-230101-1234" />
+                    <button id="generateIdBtn" class="btn btn-secondary" type="button">Generate</button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="templateSelect">Template</label>
+                <select id="templateSelect" name="template">
+                    <option value="">Select a template</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="incidentTitle">Title</label>
+                <input type="text" id="incidentTitle" name="title" placeholder="Service Outage" />
+            </div>
+
+            <div class="form-group">
+                <label for="incidentDescription">Description</label>
+                <textarea id="incidentDescription" name="description" rows="4" placeholder="Brief description of the incident"></textarea>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="incidentType">Type</label>
+                    <select id="incidentType" name="type">
+                        <option value="outage">Outage</option>
+                        <option value="degradation">Degradation</option>
+                        <option value="maintenance">Maintenance</option>
+                        <option value="security">Security</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="incidentSeverity">Severity</label>
+                    <select id="incidentSeverity" name="severity">
+                        <option value="critical">Critical</option>
+                        <option value="high">High</option>
+                        <option value="medium">Medium</option>
+                        <option value="low">Low</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="serviceName">Service Name</label>
+                <input type="text" id="serviceName" name="service_name" placeholder="API Gateway" />
+            </div>
+
+            <div class="form-group">
+                <label for="affectedServices">Affected Services</label>
+                <input type="text" id="affectedServices" name="affected_services" placeholder="API Gateway, Database" />
+            </div>
+
+            <div class="form-group">
+                <label for="time">Time (UTC)</label>
+                <input type="text" id="time" name="time" placeholder="14:30" />
+            </div>
+
+            <div class="form-group">
+                <label for="regionsAffected">Regions Affected</label>
+                <input type="text" id="regionsAffected" name="regions_affected" placeholder="US-EAST, EU-WEST" />
+            </div>
+
+            <div class="form-group">
+                <label for="customerImpact">Customer Impact</label>
+                <input type="text" id="customerImpact" name="customer_impact" placeholder="50% of users affected" />
+            </div>
+
+            <div class="button-group">
+                <button id="generateBtn" class="btn btn-primary" type="button">Generate Communications</button>
+                <button id="previewBtn" class="btn btn-secondary" type="button">Preview Template</button>
+                <button id="downloadBtn" class="btn btn-secondary" type="button">Download Incident Data</button>
+            </div>
+        </section>
+
+        <section class="communications-section">
+            <h2>Generated Communications</h2>
+            <div id="communicationsContainer" class="communications-container">
+                <!-- Rendered communications will appear here -->
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <small>© 2025 Business Incident Template Assistant</small>
         </div>
-      </details>
+    </footer>
 
-      <details class="dropdown">
-        <summary class="btn">Template Packs</summary>
-        <div class="menu">
-          <button id="loadSecurityPack" class="btn">Load Security Pack</button>
-          <button id="loadThirdPartyPack" class="btn">Load Third-Party Pack</button>
-          <button id="loadPostIncidentPack" class="btn">Load Post-Incident Pack</button>
-          <hr style="margin: 0.5rem 0; border: none; border-top: 1px solid var(--border-color, #ddd);" />
-          <label class="file-btn">
-            <input type="file" id="uploadTemplatePack" accept=".json" />
-            <span class="btn">Import Template Pack</span>
-          </label>
-        </div>
-      </details>
-      
-      <button id="openSettings" class="btn">⚙️ Settings</button>
-      <button id="generateId" class="btn primary">Generate New ID</button>
-    </div>
-  </header>
-
-  <main class="app-main">
-    
-    <aside class="sidebar">
-      <div class="panel">
-        <h3>Templates</h3>
-        <div class="field">
-          <label>Filter by Audience</label>
-          <select id="templateAudienceFilter">
-            <option value="">All audiences</option>
-            <option value="internal">Internal</option>
-            <option value="executive">Executive</option>
-            <option value="customers">Customers</option>
-            <option value="regulators">Regulators</option>
-            <option value="media">Media</option>
-            <option value="support">Support</option>
-          </select>
-        </div>
-        <div class="field">
-          <label>Filter by Severity</label>
-          <select id="templateSeverityFilter">
-            <option value="">All severities</option>
-            <option>S0</option><option>S1</option><option>S2</option><option>S3</option>
-          </select>
-        </div>
-        <div class="field">
-          <label>Filter by Category</label>
-          <select id="templateCategoryFilter">
-            <option value="">All categories</option>
-            <option value="security">Security</option>
-            <option value="third-party">Third-Party</option>
-            <option value="post-incident">Post-Incident</option>
-            <option value="general">General</option>
-          </select>
-        </div>
-        <ul id="templateList" class="template-list">
-        </ul>
-        <label class="file-btn">
-          <input type="file" id="uploadTemplate" accept=".json,.md" />
-          <span class="btn" style="width: 100%;">Add Custom Template</span>
-        </label>
-      </div>
-    </aside>
-
-    <section class="editor-pane">
-      <div class="panel">
-        <h3>Incident Details</h3>
-        <fieldset>
-          <div class="field-grid">
-            <div class="field">
-              <label for="incidentId">Incident ID <span class="required">*</span></label>
-              <input id="incidentId" placeholder="YYYYMM_NN or YYYYMM_NN.RR" required />
-              <small class="field-hint">Format: YYYYMM_NN (e.g., 202501_01)</small>
-              <span class="field-error" id="incidentId-error"></span>
-            </div>
-            <div class="field">
-              <label for="ticketId">Ticket ID</label>
-              <input id="ticketId" placeholder="INC-1234 / JIRA-5678" />
-              <small class="field-hint">Optional: Link to tracking system</small>
-            </div>
-          </div>
-          <div class="field">
-            <label for="incidentName">Name <span class="required">*</span></label>
-            <input id="incidentName" placeholder="e.g., Payment Processing Degradation" required />
-            <span class="field-error" id="incidentName-error"></span>
-          </div>
-        </fieldset>
-      </div>
-
-      <div class="panel">
-        <h3>Timeline & Severity</h3>
-        <fieldset>
-          <div class="field-grid">
-            <div class="field">
-              <label for="startTime">Start Time (Local) <span class="required">*</span></label>
-              <input id="startTime" type="datetime-local" required />
-              <span class="field-error" id="startTime-error"></span>
-            </div>
-            <div class="field">
-              <label for="nextUpdateTime">Next Update (Local)</label>
-              <input id="nextUpdateTime" type="time" />
-              <small class="field-hint" id="nextUpdateHint"></small>
-            </div>
-          </div>
-          <div class="field-grid">
-            <div class="field">
-              <label for="incidentSeverity">Severity <span class="required">*</span></label>
-              <select id="incidentSeverity" required>
-                <option value="">Select Severity</option>
-                <option value="S0">S0 - Critical (Full Outage)</option>
-                <option value="S1">S1 - High (Major Degradation)</option>
-                <option value="S2">S2 - Medium (Partial Impact)</option>
-                <option value="S3">S3 - Low (Minor Issue)</option>
-              </select>
-              <small class="field-hint" id="severityHint"></small>
-              <span class="field-error" id="incidentSeverity-error"></span>
-            </div>
-            <div class="field">
-              <label for="eta">ETA for Resolution</label>
-              <input id="eta" placeholder="e.g., 45 minutes" />
-            </div>
-          </div>
-        </fieldset>
-      </div>
-
-      <div class="panel">
-        <h3>Impact & Status</h3>
-        <fieldset>
-           <div class="field">
-              <label for="impactSummary">Impact Summary <span class="required">*</span></label>
-              <textarea id="impactSummary" rows="3" placeholder="Brief, user-facing description of the effect" required></textarea>
-              <small class="field-hint">Character count: <span id="impactSummary-count">0</span></small>
-              <span class="field-error" id="impactSummary-error"></span>
-            </div>
-            <div class="field-grid">
-              <div class="field">
-                <label for="customersAffected">Customers Affected</label>
-                <input id="customersAffected" placeholder="e.g., 18% of EU traffic" />
-              </div>
-              <div class="field">
-                <label for="dollarImpactPerHour">$ Impact / hr (est.)</label>
-                <input id="dollarImpactPerHour" type="number" min="0" step="100" />
-                <span class="field-error" id="dollarImpactPerHour-error"></span>
-              </div>
-            </div>
-            <div class="field">
-              <label for="currentStatus">Current Status <span class="required">*</span></label>
-              <select id="currentStatus" required>
-                <option value="">Select Status</option>
-                <option value="Investigating">Investigating</option>
-                <option value="Identified">Identified</option>
-                <option value="Monitoring">Monitoring</option>
-                <option value="Resolved">Resolved</option>
-              </select>
-              <span class="field-error" id="currentStatus-error"></span>
-            </div>
-            <div class="field">
-              <label for="rootCauseStatus">Root Cause Status</label>
-              <input id="rootCauseStatus" placeholder="e.g., Hypothesis, Cause identified" />
-            </div>
-        </fieldset>
-      </div>
-      
-      <div class="panel">
-        <h3>Stakeholders & Links</h3>
-        <fieldset>
-          <div class="field-grid">
-            <div class="field">
-              <label for="icName">Incident Commander (IC) <span class="required">*</span></label>
-              <input id="icName" required />
-              <span class="field-error" id="icName-error"></span>
-            </div>
-            <div class="field">
-              <label for="contact">Contact Point <span class="required">*</span></label>
-              <input id="contact" type="email" placeholder="incidents@company.com" required />
-              <span class="field-error" id="contact-error"></span>
-            </div>
-          </div>
-          <div class="field-grid">
-            <div class="field">
-              <label for="jurisdiction">Jurisdiction <span class="required">*</span></label>
-              <select id="jurisdiction" required>
-                <option value="">Select Jurisdiction</option>
-                <option value="global">Global</option>
-                <option value="EU">EU (GDPR)</option>
-                <option value="US">US</option>
-                <option value="SEC">US (SEC)</option>
-              </select>
-              <small class="field-hint" id="jurisdictionHint"></small>
-              <span class="field-error" id="jurisdiction-error"></span>
-            </div>
-            <div class="field">
-              <label for="linkStatusPage">Status Page URL</label>
-              <input id="linkStatusPage" type="url" placeholder="https://status.company.com" />
-              <span class="field-error" id="linkStatusPage-error"></span>
-            </div>
-          </div>
-        </fieldset>
-      </div>
-
-      <div class="panel">
-        <h3>Communications Generator</h3>
-        <div class="field">
-          <label for="audienceSelect">Select Audience(s) <span class="required">*</span></label>
-          <select id="audienceSelect" multiple size="6">
-            <option value="internal">Internal Responders</option>
-            <option value="executive">Executives/Leadership</option>
-            <option value="customers">Customers</option>
-            <option value="regulators">Regulators/Authorities</option>
-            <option value="media">Media/PR</option>
-            <option value="support">Support</option>
-          </select>
-          <small class="field-hint">Hold Ctrl/Cmd to select multiple</small>
-          <span class="field-error" id="audienceSelect-error"></span>
-        </div>
-        <button id="generateComms" class="btn primary">Generate Communications</button>
-        <div id="validationSummary" class="validation-summary" style="display: none;"></div>
-      </div>
-    </section>
-
-    <section class="preview-pane">
-      <div class="panel">
-        <h3>Selected Template Editor</h3>
-        <div id="selectedTemplateMeta" class="meta"></div>
-        <div id="templateLintResults" class="lint-results" style="display: none;"></div>
-        <textarea id="templateRaw" rows="10" spellcheck="false" placeholder="Select a template from the list to view its raw content here..."></textarea>
-        <div class="toolbar">
-          <button id="lintTemplate" class="btn">🔍 Lint Template</button>
-          <button id="applyTemplate" class="btn">Apply Changes</button>
-        </div>
-      </div>
-      
-      <div class="panel">
-        <h3>Detected Tokens</h3>
-        <form id="tokenForm" class="token-form">
-        </form>
-      </div>
-
-      <div class="panel">
-        <h3>Rendered Communication</h3>
-        <div class="toolbar">
-          <button id="copyRendered" class="btn">Copy</button>
-        </div>
-        <pre id="renderedText" class="rendered"></pre>
-      </div>
-
-      <div class="panel">
-        <h3>Print Preview</h3>
-        <div class="toolbar">
-          <button onclick="window.print()" class="btn">Print to PDF</button>
-        </div>
-        <article id="printPreview" class="preview"></article>
-      </div>
-    </section>
-  </main>
-
-  <footer class="app-footer">
-    <span>Business ITA • Runs offline in evergreen browsers • <span id="validationStatus"></span></span>
-  </footer>
-
-  <!-- Settings Modal -->
-  <div id="settingsModal" class="modal" style="display: none;">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2>Policy Settings</h2>
-        <button id="closeSettings" class="btn-close" aria-label="Close">&times;</button>
-      </div>
-      <div class="modal-body">
-        <div class="settings-section">
-          <h3>Severity SLAs</h3>
-          <div class="field">
-            <label for="sla-S0">S0 - Update Frequency (minutes)</label>
-            <input id="sla-S0" type="number" min="1" value="15" />
-          </div>
-          <div class="field">
-            <label for="sla-S1">S1 - Update Frequency (minutes)</label>
-            <input id="sla-S1" type="number" min="1" value="30" />
-          </div>
-          <div class="field">
-            <label for="sla-S2">S2 - Update Frequency (minutes)</label>
-            <input id="sla-S2" type="number" min="1" value="60" />
-          </div>
-          <div class="field">
-            <label for="sla-S3">S3 - Update Frequency (minutes)</label>
-            <input id="sla-S3" type="number" min="1" value="120" />
-          </div>
-        </div>
-
-        <div class="settings-section">
-          <h3>Jurisdiction Requirements</h3>
-          <div class="field">
-            <label>
-              <input type="checkbox" id="gdpr-enabled" checked />
-              Enable GDPR Compliance Checks (EU)
-            </label>
-          </div>
-          <div class="field">
-            <label for="gdpr-notification">GDPR Notification Window (hours)</label>
-            <input id="gdpr-notification" type="number" min="1" value="72" />
-          </div>
-          <div class="field">
-            <label>
-              <input type="checkbox" id="sec-enabled" />
-              Enable SEC Reporting Requirements (US)
-            </label>
-          </div>
-          <div class="field">
-            <label for="sec-notification">SEC Notification Window (days)</label>
-            <input id="sec-notification" type="number" min="1" value="4" />
-          </div>
-        </div>
-
-        <div class="settings-section">
-          <h3>Field Constraints</h3>
-          <div class="field">
-            <label for="impact-min-length">Impact Summary Min Length (chars)</label>
-            <input id="impact-min-length" type="number" min="0" value="20" />
-          </div>
-          <div class="field">
-            <label for="impact-max-length">Impact Summary Max Length (chars)</label>
-            <input id="impact-max-length" type="number" min="1" value="500" />
-          </div>
-          <div class="field">
-            <label for="id-format">Incident ID Format</label>
-            <select id="id-format">
-              <option value="YYYYMM_NN">YYYYMM_NN (e.g., 202501_01)</option>
-              <option value="YYYY-MM-NN">YYYY-MM-NN (e.g., 2025-01-01)</option>
-              <option value="custom">Custom Regex</option>
-            </select>
-          </div>
-          <div class="field" id="custom-id-format-field" style="display: none;">
-            <label for="custom-id-regex">Custom ID Regex</label>
-            <input id="custom-id-regex" type="text" placeholder="^[A-Z]{3}-\d{4}$" />
-          </div>
-        </div>
-
-        <div class="settings-section">
-          <h3>Communication Guidelines</h3>
-          <div class="field">
-            <label>
-              <input type="checkbox" id="require-approval" />
-              Require approval before external communications
-            </label>
-          </div>
-          <div class="field">
-            <label for="tone-preference">Default Tone</label>
-            <select id="tone-preference">
-              <option value="formal">Formal</option>
-              <option value="professional">Professional</option>
-              <option value="empathetic">Empathetic</option>
-            </select>
-          </div>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button id="resetSettings" class="btn">Reset to Defaults</button>
-        <button id="saveSettings" class="btn primary">Save Settings</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Revision History Modal -->
-  <div id="historyModal" class="modal" style="display: none;">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2>Revision History</h2>
-        <button id="closeHistory" class="btn-close" aria-label="Close">&times;</button>
-      </div>
-      <div class="modal-body">
-        <ul id="revisionList" class="revision-list"></ul>
-      </div>
-      <div class="modal-footer">
-        <button id="closeHistoryBtn" class="btn">Close</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="toastContainer"></div>
-
-  <!-- Core Scripts - Load in this exact order -->
-  <script src="assets/js/config.js"></script>
-  <script src="assets/js/validation.js"></script>
-  <script src="assets/js/linter.js"></script>
-  <script src="assets/js/templates.js"></script>
-  <script src="assets/js/templates-extended.js"></script>
-  <script src="assets/js/store.js"></script>
-  <script src="assets/js/render.js"></script>
-  <script src="assets/js/parser.js"></script>
-  <script src="assets/js/ui.js"></script>
-  <script src="assets/js/settings.js"></script>
-  <script src="assets/js/history.js"></script>
-  <script src="assets/js/app.js"></script>
+    <script src="config.js"></script>
+    <script src="store.js"></script>
+    <script src="templates.js"></script>
+    <script src="templates_extended.js"></script>
+    <script src="parser.js"></script>
+    <script src="validation.js"></script>
+    <script src="linter.js"></script>
+    <script src="history.js"></script>
+    <script src="render.js"></script>
+    <script src="settings.js"></script>
+    <script src="ui.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>
