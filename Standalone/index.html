@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configurable Incident Assistant</title>
+    <style>
+        :root {
+            --bg-primary: #ffffff; --bg-secondary: #f8f9fa; --bg-tertiary: #e9ecef;
+            --text-primary: #212529; --text-secondary: #6c757d; --border-color: #dee2e6;
+            --accent-color: #0d6efd; --accent-hover: #0b5ed7; --success-color: #198754;
+            --danger-color: #dc3545; --shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #1a1d23; --bg-secondary: #24272e; --bg-tertiary: #2d3139;
+            --text-primary: #e9ecef; --text-secondary: #adb5bd; --border-color: #495057;
+            --accent-color: #3d8bfd; --accent-hover: #2678ec; --shadow: 0 4px 16px rgba(0,0,0,0.25);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg-secondary); color: var(--text-primary); line-height: 1.6;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        .container { max-width: 1600px; margin: 0 auto; padding: 0 1.5rem; }
+        .header { background: var(--bg-primary); border-bottom: 1px solid var(--border-color); padding: 1rem 0; position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow); }
+        .header-content { display: flex; justify-content: space-between; align-items: center; }
+        .logo { display: flex; align-items: center; gap: 0.75rem; }
+        .logo svg { width: 32px; height: 32px; }
+        .logo h1 { font-size: 1.5rem; font-weight: 600; }
+        .theme-toggle { background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 8px; padding: 0.5rem 1rem; cursor: pointer; font-size: 1.25rem; transition: all 0.2s ease; }
+        .theme-toggle:hover { background: var(--accent-color); color: white; border-color: var(--accent-color); transform: scale(1.05); }
+
+        .app-layout { display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; align-items: flex-start; }
+        .main-content { padding: 2rem 0; }
+        .wizard { background: var(--bg-primary); border-radius: 12px; padding: 2rem; box-shadow: var(--shadow); margin-bottom: 2rem; }
+
+        .step-indicator { display: flex; justify-content: space-between; margin-bottom: 2.5rem; position: relative; }
+        .step-indicator::before { content: ''; position: absolute; top: 20px; left: 0; right: 0; height: 2px; background: var(--border-color); z-index: 0; }
+        #step-progress { position: absolute; top: 20px; left: 0; height: 2px; background: var(--accent-color); z-index: 1; width: 0%; transition: width 0.4s ease; }
+        .step { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; position: relative; flex: 1; z-index: 2; }
+        .step-number { width: 40px; height: 40px; border-radius: 50%; background: var(--bg-secondary); border: 2px solid var(--border-color); display: flex; align-items: center; justify-content: center; font-weight: 600; transition: all 0.3s ease; }
+        .step.active .step-number { background: var(--accent-color); border-color: var(--accent-color); color: white; transform: scale(1.1); }
+        .step.completed .step-number { background: var(--success-color); border-color: var(--success-color); color: white; }
+        .step-label { font-size: 0.875rem; color: var(--text-secondary); text-align: center; }
+        .step.active .step-label { color: var(--text-primary); font-weight: 600; }
+
+        .step-content { display: none; }
+        .step-content.active { display: block; animation: fadeIn 0.4s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .form-group { margin-bottom: 1.5rem; }
+        label { display: block; margin-bottom: 0.5rem; font-weight: 500; }
+        .required { color: var(--danger-color); }
+        .help-text { font-size: 0.875rem; color: var(--text-secondary); margin-top: 0.25rem; }
+        input[type="text"], input[type="number"], input[type="datetime-local"], textarea, select { width: 100%; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-secondary); color: var(--text-primary); font-size: 1rem; transition: all 0.2s ease; }
+        input:focus, textarea:focus, select:focus { outline: none; border-color: var(--accent-color); box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.1); }
+        textarea { resize: vertical; min-height: 100px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+        .btn { padding: 0.75rem 1.5rem; border: none; border-radius: 6px; font-size: 1rem; font-weight: 500; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 0.5rem; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-primary { background: var(--accent-color); color: white; }
+        .btn-primary:hover:not(:disabled) { background: var(--accent-hover); transform: translateY(-1px); }
+        .btn-secondary { background: var(--bg-tertiary); color: var(--text-primary); border: 1px solid var(--border-color); }
+        .btn-secondary:hover:not(:disabled) { background: var(--border-color); }
+        .btn-success { background: var(--success-color); color: white; }
+        .btn-danger { background: var(--danger-color); color: white; }
+        .btn-actions { display: flex; justify-content: space-between; gap: 1rem; margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--border-color); }
+        
+        .output-section, .live-preview-panel { background: var(--bg-primary); border-radius: 12px; padding: 2rem; box-shadow: var(--shadow); }
+        .live-preview-panel { position: sticky; top: 100px; }
+        .output-section h2, .live-preview-panel h2 { margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem; }
+        .template-preview { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; padding: 1.5rem; margin-bottom: 1rem; }
+        .template-preview h3 { margin-bottom: 1rem; color: var(--accent-color); }
+        .preview-content { background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 6px; padding: 1rem; font-family: 'Courier New', monospace; font-size: 0.875rem; white-space: pre-wrap; max-height: 300px; overflow-y: auto; }
+        .template-actions { margin-top: 1rem; display: flex; flex-wrap: wrap; gap: 0.5rem; }
+
+        .toast-container { position: fixed; bottom: 1rem; right: 1rem; z-index: 2000; display: flex; flex-direction: column; gap: 0.5rem; }
+        .toast { color: white; padding: 1rem 1.5rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); animation: slideIn 0.3s ease; }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); z-index: 2000; align-items: center; justify-content: center; }
+        .modal.active { display: flex; }
+        .modal-content { background: var(--bg-primary); border-radius: 12px; padding: 0; max-width: 900px; max-height: 90vh; box-shadow: 0 8px 32px rgba(0,0,0,0.3); width: 90%; display: flex; flex-direction: column; }
+        .modal-header { padding: 1.5rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+        .modal-header h2 { margin: 0; }
+        .modal-body { padding: 2rem; overflow-y: auto; }
+        .modal-footer { padding: 1.5rem 2rem; display: flex; gap: 1rem; border-top: 2px solid var(--border-color); background: var(--bg-secondary); border-bottom-left-radius: 12px; border-bottom-right-radius: 12px;}
+        .close-btn { background: none; border: none; font-size: 2rem; cursor: pointer; color: var(--text-secondary); padding: 0; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: all 0.2s ease; }
+        .close-btn:hover { background: var(--bg-tertiary); color: var(--text-primary); }
+        
+        .modal-tabs { display: flex; margin: -2rem -2rem 2rem -2rem; padding: 0 2rem; }
+        .tab-btn { padding: 1rem; border: none; background: none; cursor: pointer; font-size: 1rem; font-weight: 500; color: var(--text-secondary); border-bottom: 3px solid transparent; outline: none; transition: color 0.2s ease-in-out, border-color 0.2s ease-in-out; }
+        .tab-btn:focus { box-shadow: none; }
+        .tab-btn.active { color: var(--accent-color); border-bottom-color: var(--accent-color); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        
+        .severity-config-item { border: 1px solid var(--border-color); border-radius: 8px; padding: 1.5rem; margin-bottom: 1rem; }
+        .severity-badge { display: inline-block; padding: 0.25rem 0.75rem; border-radius: 4px; font-weight: 600; }
+        .severity-S0 { background: #dc3545; color: white; } .severity-S1 { background: #fd7e14; color: white; }
+        .severity-S2 { background: #ffc107; color: #000; } .severity-S3 { background: #20c997; color: white; }
+        
+        .timeline-entry, .person-entry, .snippet-entry { display: flex; gap: 1rem; align-items: center; margin-bottom: 0.75rem; }
+        .timeline-entry input, .person-entry input, .snippet-entry input { flex: 1; }
+        
+        .category-management-profiles { margin-bottom: 2rem; display: flex; gap: 0.5rem; flex-wrap: wrap; }
+        .category-management { border: 1px solid var(--border-color); border-radius: 6px; overflow: hidden; }
+        .category-management details:not(:last-child) { border-bottom: 1px solid var(--border-color); }
+        .category-management summary { cursor: pointer; padding: 0.75rem; font-weight: 500; display: flex; align-items: center; gap: 0.5rem; }
+        .category-management summary:hover { background: var(--bg-secondary); }
+        .category-management-types { padding: 0.75rem 0.75rem 0.75rem 2.5rem; display: flex; flex-direction: column; gap: 0.5rem; background: var(--bg-secondary); }
+        .category-management-types label { font-weight: normal; }
+
+        @media (max-width: 1200px) { .app-layout { grid-template-columns: 1fr; } .live-preview-panel { position: relative; top: 0; } }
+        @media (max-width: 768px) { .form-row { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="3" stroke="#0d6efd"/><path d="M7 8h10M7 12h6M7 16h10" stroke="#0d6efd"/></svg>
+                    <h1>Configurable Incident Assistant</h1>
+                </div>
+                <div>
+                    <button id="historyBtn" type="button" class="btn btn-secondary" onclick="openHistoryModal()" style="margin-right: 0.5rem;">📜 History</button>
+                    <button id="configBtn" type="button" class="btn btn-secondary" onclick="openConfigModal()" style="margin-right: 1rem;">⚙️ Configure</button>
+                    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">🌙</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+            <div class="app-layout">
+                <div class="wizard">
+                    <div class="step-indicator">
+                        <div id="step-progress"></div>
+                        <div class="step active" data-step="1"><div class="step-number">1</div><div class="step-label">Basic Info</div></div>
+                        <div class="step" data-step="2"><div class="step-number">2</div><div class="step-label">Impact & Timeline</div></div>
+                        <div class="step" data-step="3"><div class="step-number">3</div><div class="step-label">Communication</div></div>
+                        <div class="step" data-step="4"><div class="step-number">4</div><div class="step-label">Review</div></div>
+                        <div class="step" data-step="5"><div class="step-number">5</div><div class="step-label">Post-Mortem</div></div>
+                    </div>
+
+                    <div class="step-content active" data-step="1">
+                        <h2>Step 1: Basic Incident Information</h2>
+                        <div class="form-group">
+                            <label for="incidentId">Incident ID <span class="required">*</span></label>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <input type="text" id="incidentId" placeholder="e.g., INC-20251013-001" required aria-required="true">
+                                <button class="btn btn-secondary" onclick="generateIncidentId()">Generate</button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="incidentName">Incident Name <span class="required">*</span></label>
+                            <input type="text" id="incidentName" placeholder="e.g., API Gateway Outage - US-East" required aria-required="true">
+                        </div>
+                        <div class="form-group">
+                            <label for="severity">Severity <span class="required">*</span></label>
+                            <select id="severity" required aria-required="true" onchange="showSeverityInfo(this.value)"></select>
+                            <div id="severityInfo" class="help-text" style="margin-top: 0.75rem; padding: 0.75rem; background: var(--bg-secondary); border-radius: 6px; display: none;"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="incidentCategory">Incident Category <span class="required">*</span></label>
+                            <select id="incidentCategory" required aria-required="true" onchange="updateSubcategories()"></select>
+                        </div>
+                        <div class="form-group">
+                            <label for="incidentType">Incident Type <span class="required">*</span></label>
+                            <select id="incidentType" required aria-required="true">
+                                <option value="">Select category first...</option>
+                            </select>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label id="startTimeLabel" for="startTime">Start Time <span class="required">*</span></label>
+                                <div style="display: flex; gap: 0.5rem;">
+                                    <input type="datetime-local" id="startTime" required aria-required="true">
+                                    <button class="btn btn-secondary" onclick="setStartTimeNow()">Now</button>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="incidentCommander">Incident Commander <span class="required">*</span></label>
+                                <input type="text" id="incidentCommander" list="personnel-commanders" placeholder="Jane Doe" required aria-required="true">
+                                <datalist id="personnel-commanders"></datalist>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="step-content" data-step="2">
+                        <h2>Step 2: Impact & Timeline</h2>
+                        <div class="form-group">
+                            <label for="impactSummary">Impact Summary <span class="required">*</span></label>
+                            <textarea id="impactSummary" placeholder="1-3 sentences describing what users are experiencing. Include scope, symptoms, and affected services." required aria-required="true"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="currentStatus">Current Status <span class="required">*</span></label>
+                            <textarea id="currentStatus" placeholder="What is happening right now? What actions are underway to mitigate or resolve?" required aria-required="true"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Timeline of Events</label>
+                            <div id="timeline-entries"></div>
+                            <button type="button" class="btn btn-secondary" onclick="addTimelineEntry()">+ Add Entry</button>
+                        </div>
+                    </div>
+
+                    <div class="step-content" data-step="3">
+                        <h2>Step 3: Communication Plan</h2>
+                        <div class="form-group">
+                            <label>Target Audience <span class="required">*</span></label>
+                             <div style="display: grid; gap: 1rem;">
+                                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; padding: 1rem; background: var(--bg-secondary); border-radius: 6px; border: 2px solid transparent;">
+                                    <input type="checkbox" name="audience" value="internal" onchange="selectAudience(this)"><strong>Internal Team</strong>
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; padding: 1rem; background: var(--bg-secondary); border-radius: 6px; border: 2px solid transparent;">
+                                    <input type="checkbox" name="audience" value="customer" onchange="selectAudience(this)"><strong>Customers</strong>
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; padding: 1rem; background: var(--bg-secondary); border-radius: 6px; border: 2px solid transparent;">
+                                    <input type="checkbox" name="audience" value="executive" onchange="selectAudience(this)"><strong>Executive Leadership</strong>
+                                </label>
+                            </div>
+                        </div>
+                         <div class="form-group">
+                            <label for="nextUpdate">Next Update Time</label>
+                            <input type="text" id="nextUpdate" placeholder="e.g., 15:30 UTC or in 30 minutes">
+                        </div>
+                    </div>
+
+                    <div class="step-content" data-step="4">
+                        <h2>Step 4: Review & Generate Communications</h2>
+                        <div id="reviewContent"></div>
+                    </div>
+
+                    <div class="step-content" data-step="5">
+                        <h2>Step 5: Post-Mortem / RCA Details</h2>
+                        <div class="form-group">
+                            <label for="rcaDetail">Detailed Root Cause Analysis <span class="required">*</span></label>
+                            <textarea id="rcaDetail" placeholder="Provide a detailed explanation of the root cause. What was the sequence of events that led to the incident?" required aria-required="true"></textarea>
+                        </div>
+                         <div class="form-group">
+                            <label for="resolutionSteps">Resolution Steps <span class="required">*</span></label>
+                            <textarea id="resolutionSteps" placeholder="Describe the steps taken to resolve the incident." required aria-required="true"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="correctiveActions">Corrective Actions (Action Items)</label>
+                            <textarea id="correctiveActions" placeholder="List the action items to prevent recurrence. e.g., AI-1: Update deployment script with validation - @jdoe - Due 2025-10-20"></textarea>
+                        </div>
+                         <div class="form-group">
+                            <label for="lessonsLearned">Lessons Learned</label>
+                            <textarea id="lessonsLearned" placeholder="What went well? What could be improved in our incident response process?"></textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="btn-actions">
+                        <button class="btn btn-secondary" id="prevBtn" onclick="previousStep()" style="display: none;">← Previous</button>
+                        <button class="btn btn-success" id="reportBtn" onclick="generateIncidentReport()" style="display: none;">🖨️ Generate Report</button>
+                        <div style="flex: 1;"></div>
+                        <button class="btn btn-primary" id="nextBtn" onclick="nextStep()">Next →</button>
+                        <button class="btn btn-success" id="generateBtn" onclick="generateCommunications()" style="display: none;">✓ Generate Comms</button>
+                        <button class="btn btn-success" id="postMortemBtn" onclick="generatePostMortem()" style="display: none;">📄 Generate Post-Mortem</button>
+                    </div>
+                </div>
+
+                <div class="live-preview-panel">
+                    <h2>👁️ Live Preview</h2>
+                    <div id="livePreviewOutput">
+                        <div class="help-text" style="text-align: center; padding: 2rem;">Fill out the form to see live previews of your communication templates.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="outputSection" style="display: none; margin-top: 2rem;">
+                <div class="output-section">
+                    <h2>🚀 Generated Outputs</h2>
+                    <div id="generatedOutput"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="configModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="configModalTitle">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="configModalTitle">⚙️ Configuration</h2>
+                <button class="close-btn" onclick="closeConfigModal()" aria-label="Close configuration dialog">&times;</button>
+            </div>
+            <div class="modal-tabs">
+                <button class="tab-btn" onclick="openTab(event, 'general-tab')">General</button>
+                <button class="tab-btn" onclick="openTab(event, 'categories-tab')">Categories</button>
+                <button class="tab-btn" onclick="openTab(event, 'severity-tab')">Severity</button>
+                <button class="tab-btn" onclick="openTab(event, 'personnel-tab')">Personnel</button>
+                <button class="tab-btn" onclick="openTab(event, 'snippets-tab')">Snippets</button>
+            </div>
+            <div class="modal-body">
+                <div id="general-tab" class="tab-content">
+                    <h3>General Settings</h3>
+                    <div class="form-group">
+                        <label for="timeZoneSelect">Time Zone</label>
+                        <select id="timeZoneSelect"></select>
+                        <p class="help-text">All timestamps will be displayed in this time zone.</p>
+                    </div>
+                    <hr style="margin: 2rem 0;">
+                    <h3>Configuration Management</h3>
+                    <div class="form-group" style="display: flex; gap: 0.5rem;">
+                        <button class="btn btn-secondary" onclick="exportConfig()">📤 Export Configuration</button>
+                        <button class="btn btn-secondary" onclick="importConfig()">📥 Import Configuration</button>
+                    </div>
+                    <p class="help-text">Save your current settings to a file or load a configuration from a file to sync with your team.</p>
+                </div>
+                <div id="categories-tab" class="tab-content">
+                    <h3>Manage Incident Categories & Types</h3>
+                    <p class="help-text">Enable or disable categories to customize the dropdowns for your business.</p>
+                    <div class="category-management-profiles">
+                        <button class="btn btn-secondary" onclick="applyCategoryProfile('tech')">Apply Tech/SaaS Profile</button>
+                        <button class="btn btn-secondary" onclick="applyCategoryProfile('business')">Apply General Business Profile</button>
+                        <button class="btn btn-secondary" onclick="applyCategoryProfile('all')">Enable All</button>
+                    </div>
+                    <div id="category-management-list" class="category-management"></div>
+                </div>
+                <div id="severity-tab" class="tab-content"></div>
+                <div id="personnel-tab" class="tab-content">
+                    <h3>Manage Personnel Roles</h3>
+                    <p class="help-text">Add people to roles to quickly select them from dropdowns in the form.</p>
+                    <div id="personnel-list"></div>
+                    <button class="btn btn-secondary" onclick="addPersonEntry()">+ Add Person</button>
+                </div>
+                <div id="snippets-tab" class="tab-content">
+                    <h3>Manage Custom Snippets</h3>
+                    <p class="help-text">Create snippets like `{{status_page}}` that will be replaced with their value.</p>
+                    <div id="snippet-list"></div>
+                    <button class="btn btn-secondary" onclick="addSnippetEntry()">+ Add Snippet</button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-success" onclick="saveConfig()">💾 Save Configuration</button>
+                <button class="btn btn-danger" onclick="resetConfig()">💥 Reset All to Defaults</button>
+                <button class="btn btn-secondary" onclick="closeConfigModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="historyModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="historyModalTitle">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="historyModalTitle">📜 Incident History</h2>
+                <button class="close-btn" onclick="closeHistoryModal()" aria-label="Close history dialog">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p class="help-text">Review past incidents. Click to expand and see details.</p>
+                <div id="history-list"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-danger" onclick="clearHistory()">💥 Clear All History</button>
+                <button class="btn btn-secondary" onclick="closeHistoryModal()">Close</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="toast-container" role="status" aria-live="polite"></div>
+
+    <script>
+        // MASTER DATA (Single Source of Truth)
+        const masterIncidentCategories = {
+            technical: { name: 'Technical/Infrastructure', types: { 'service-outage': 'Complete Service Outage', 'partial-outage': 'Partial Service Outage', 'performance-degradation': 'Performance Degradation', 'api-failure': 'API/Integration Failure', 'database-issue': 'Database Issues', 'network-issue': 'Network Connectivity Issues', 'app-bug': 'Application Bug/Logic Error' } },
+            security: { name: 'Security & Compliance', types: { 'data-breach': 'Data Breach/Exposure', 'unauthorized-access': 'Unauthorized Access', 'ransomware': 'Ransomware Attack', 'ddos': 'DDoS Attack', 'phishing': 'Phishing Campaign', 'malware': 'Malware Detection', 'vulnerability': 'Critical Vulnerability' } },
+            product: { name: 'Product & Development Lifecycle', types: { 'failed-launch': 'Failed Product Launch/Release', 'critical-design-flaw': 'Critical Design or UX Flaw', 'feature-rollback': 'Feature Rollback Due to Issues', 'test-env-failure': 'Beta/Testing Environment Failure' } },
+            operations: { name: 'Operations & Process', types: { 'deployment-failure': 'Failed Deployment/Rollback', 'config-error': 'Configuration Error', 'maintenance-issue': 'Maintenance Window Issue', 'backup-failure': 'Backup/Recovery Failure', 'monitoring-gap': 'Monitoring Gap/Alert Failure' } },
+            data: { name: 'Data & Storage', types: { 'data-loss': 'Data Loss/Corruption', 'data-sync': 'Data Synchronization Failure', 'storage-full': 'Storage Capacity Exceeded' } },
+            vendor: { name: 'Third-Party/Vendor', types: { 'vendor-outage': 'Vendor Service Outage', 'cloud-provider': 'Cloud Provider Issue', 'saas-failure': 'SaaS Application Failure', 'vendor-breach': 'Vendor Security Breach' } },
+            support: { name: 'Customer Support & Success', types: { 'support-platform-outage': 'Support Platform Outage', 'high-ticket-volume': 'High Ticket Volume Overload', 'kb-error': 'Critical Knowledge Base Error' } },
+            marketing: { name: 'Marketing & Communications', types: { 'pr-crisis': 'Public Relations Crisis', 'social-media-compromise': 'Social Media Account Compromise', 'ad-platform-failure': 'Ad Platform Failure/Suspension', 'website-content-error': 'Critical Website Content Error' } },
+            sales: { name: 'Sales & Customer Relations', types: { 'crm-outage': 'CRM Platform Outage', 'client-escalation': 'Major Client Escalation', 'sales-process-breakdown': 'Sales Process Breakdown' } },
+            hr: { name: 'Human Resources & Personnel', types: { 'safety-incident': 'Workplace Safety Incident', 'policy-violation': 'HR Policy Violation', 'payroll-issue': 'Payroll & Benefits Issue', 'staffing-disruption': 'Staffing Disruption' } },
+            workforce: { name: 'Workforce & Workspace', types: { 'remote-connectivity': 'Remote Connectivity Issue', 'equipment-failure': 'Company Equipment Failure', 'workspace-unavailable': 'Workspace Unavailability', 'access-issue': 'Critical Access Issue', 'lost-stolen-equipment': 'Lost or Stolen Equipment' } },
+            finance: { name: 'Financial & Administrative', types: { 'financial-system-failure': 'Financial System Failure', 'fraud-activity': 'Fraudulent Activity', 'billing-discrepancy': 'Major Billing Discrepancy' } },
+            legal: { name: 'Legal & Contractual', types: { 'contract-breach': 'Contractual Breach', 'ip-infringement': 'Intellectual Property Infringement', 'litigation-notice': 'Litigation Notice Received' } },
+            governance: { name: 'Corporate Governance & Ethics', types: { 'ethics-violation': 'Major Ethics Violation Report', 'governance-failure': 'Failure in Governance Process', 'whistleblower-event': 'Whistleblower Event' } },
+            manufacturing: { name: 'Manufacturing & Production', types: { 'line-halt': 'Production Line Halt', 'quality-failure': 'Major Quality Control Failure', 'equipment-malfunction': 'Critical Equipment Malfunction', 'material-shortage': 'Raw Material Shortage' } },
+            environmental: { name: 'Environmental/Physical', types: { 'power-outage': 'Power Outage', 'natural-disaster': 'Natural Disaster', 'facilities-closure': 'Office/Facilities Closure', 'utility-failure': 'Essential Utility Failure' } },
+            business: { name: 'Business Continuity', types: { 'dr-activation': 'Disaster Recovery Activation', 'failover': 'Failover Event', 'supply-chain-disruption': 'Supply Chain Disruption' } }
+        };
+
+        const industryProfiles = {
+            tech: ['technical', 'security', 'product', 'operations', 'data', 'vendor', 'support', 'marketing', 'hr', 'workforce', 'business'],
+            business: ['marketing', 'sales', 'hr', 'finance', 'legal', 'governance', 'vendor', 'support', 'environmental', 'workforce', 'business']
+        };
+        
+        const timezones = [ "UTC", "America/New_York", "America/Chicago", "America/Denver", "America/Los_Angeles", "Europe/London", "Europe/Paris", "Asia/Tokyo", "Australia/Sydney" ];
+        
+        const masterSuggestions = {
+            'service-outage': 'We are investigating a full service outage. All users are currently unable to access the platform. ',
+            'performance-degradation': 'We are investigating a performance degradation. Users may be experiencing slow response times and timeouts when using the application. ',
+            'data-breach': 'We are investigating a potential data breach. Our security team is working to understand the scope and impact. All external access has been temporarily restricted. ',
+            'phishing': 'We are aware of a phishing campaign targeting our users. We are taking steps to block the malicious emails and are investigating the source. ',
+            'remote-connectivity': 'We are investigating reports of remote connectivity issues. Some employees may be unable to connect to the VPN or other internal resources. ',
+            'crm-outage': 'We are experiencing an outage with our CRM provider. Sales and Support teams are unable to access customer records at this time. '
+        };
+
+        // APP STATE & CONFIG
+        let currentStep = 1;
+        const totalSteps = 5;
+        let incidentData = {};
+
+        const defaultConfigs = {
+            timeZone: "UTC",
+            severity: { 
+                S0: { acronym: 'S0', name: 'Critical', description: 'Complete service outage or critical security breach affecting all or majority of users.', slaResponse: '15 minutes' }, 
+                S1: { acronym: 'S1', name: 'High', description: 'Major functionality degraded, significant customer impact, or high-severity security issue.', slaResponse: '30 minutes' }, 
+                S2: { acronym: 'S2', name: 'Medium', description: 'Partial service degradation with limited customer impact.', slaResponse: '2 hours' }, 
+                S3: { acronym: 'S3', name: 'Low', description: 'Minor issue with minimal or no customer impact.', slaResponse: '4 hours' } 
+            },
+            personnel: [ { role: 'Incident Commander', name: 'Jane Doe' }, { role: 'Comms Lead', name: 'John Smith' } ],
+            snippets: [ { key: '{{status_page}}', value: 'https://status.yourcompany.com' }, { key: '{{contact_email}}', value: 'support@yourcompany.com' } ],
+            enabledCategories: {}
+        };
+        let appConfigs = {};
+        
+        // A11y state
+        let modalTriggerElement = null;
+
+        // DOM ELEMENTS CACHE
+        const DOMElements = {};
+
+        // INITIALIZATION
+        document.addEventListener('DOMContentLoaded', () => {
+            cacheDOMElements();
+            initTheme();
+            loadConfig();
+            loadProgress();
+            attachFormListeners();
+            addTimelineEntry(true);
+        });
+        
+        function cacheDOMElements() {
+            const ids = ['incidentId', 'incidentName', 'severity', 'startTime', 'incidentCommander', 'impactSummary', 'currentStatus', 'nextUpdate', 'rcaDetail', 'resolutionSteps', 'correctiveActions', 'lessonsLearned', 'incidentCategory', 'incidentType', 'startTimeLabel', 'timeZoneSelect', 'configModal', 'configBtn', 'historyModal', 'historyBtn', 'reportBtn'];
+            ids.forEach(id => { if(document.getElementById(id)) DOMElements[id] = document.getElementById(id) });
+            DOMElements.toastContainer = document.querySelector('.toast-container');
+        }
+
+        // CONFIGURATION MANAGEMENT
+        function loadConfig() {
+            const saved = localStorage.getItem('bita-config');
+            appConfigs = saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(defaultConfigs));
+            if (!appConfigs.enabledCategories || Object.keys(appConfigs.enabledCategories).length === 0) {
+                appConfigs.enabledCategories = {};
+                for (const catKey in masterIncidentCategories) {
+                    appConfigs.enabledCategories[catKey] = { enabled: true, types: {} };
+                    for (const typeKey in masterIncidentCategories[catKey].types) {
+                        appConfigs.enabledCategories[catKey].types[typeKey] = true;
+                    }
+                }
+                applyCategoryProfile('tech', false);
+            }
+            updateTimezoneLabels();
+            populateSeverityDropdown();
+            populateCategoryDropdowns();
+            populatePersonnelDatalist();
+        }
+
+        function saveConfigToStorage() {
+            localStorage.setItem('bita-config', JSON.stringify(appConfigs));
+        }
+
+        function openConfigModal() {
+            modalTriggerElement = document.activeElement;
+            DOMElements.configModal.classList.add('active');
+            populateConfigModal();
+            openTab(null, 'general-tab');
+            const focusableElements = DOMElements.configModal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+            const firstElement = focusableElements[0];
+            const lastElement = focusableElements[focusableElements.length - 1];
+            firstElement.focus();
+            DOMElements.configModal.addEventListener('keydown', (e) => {
+                if (e.key !== 'Tab') return;
+                if (e.shiftKey) { if (document.activeElement === firstElement) { lastElement.focus(); e.preventDefault(); }
+                } else { if (document.activeElement === lastElement) { firstElement.focus(); e.preventDefault(); } }
+            });
+        }
+
+        function closeConfigModal() {
+            DOMElements.configModal.classList.remove('active');
+            if (modalTriggerElement) modalTriggerElement.focus();
+        }
+
+        function saveConfig() {
+            appConfigs.timeZone = DOMElements.timeZoneSelect.value;
+            Object.keys(appConfigs.severity).forEach(key => { 
+                appConfigs.severity[key].acronym = document.getElementById(`severity_${key}_acronym`).value.substring(0,2);
+                appConfigs.severity[key].description = document.getElementById(`severity_${key}_description`).value; 
+                appConfigs.severity[key].slaResponse = document.getElementById(`severity_${key}_slaResponse`).value; 
+            });
+            appConfigs.personnel = Array.from(document.querySelectorAll('.person-entry')).map(entry => ({ role: entry.querySelector('input[data-type="role"]').value.trim(), name: entry.querySelector('input[data-type="name"]').value.trim() })).filter(p => p.role && p.name);
+            appConfigs.snippets = Array.from(document.querySelectorAll('.snippet-entry')).map(entry => ({ key: entry.querySelector('input[data-type="key"]').value.trim(), value: entry.querySelector('input[data-type="value"]').value.trim() })).filter(s => s.key && s.value);
+            const categoryList = document.getElementById('category-management-list');
+            for (const catKey in masterIncidentCategories) {
+                const catCheckbox = categoryList.querySelector(`input[data-category-key="${catKey}"]`);
+                appConfigs.enabledCategories[catKey].enabled = catCheckbox.checked;
+                for (const typeKey in masterIncidentCategories[catKey].types) {
+                    const typeCheckbox = categoryList.querySelector(`input[data-type-key="${typeKey}"]`);
+                    appConfigs.enabledCategories[catKey].types[typeKey] = typeCheckbox.checked;
+                }
+            }
+            saveConfigToStorage();
+            closeConfigModal();
+            showToast('Configuration saved!', 'success');
+            loadConfig(); // Reload all configs to update UI
+            updateLivePreview();
+        }
+        
+        function resetConfig() {
+            if (confirm('Are you sure you want to reset ALL configurations to their defaults? This cannot be undone.')) {
+                localStorage.removeItem('bita-config');
+                location.reload();
+            }
+        }
+        
+        function populateConfigModal() {
+            const tzSelect = DOMElements.timeZoneSelect;
+            tzSelect.innerHTML = '';
+            const browserTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            const allTimezones = new Set([browserTz, ...timezones]);
+            allTimezones.forEach(tz => {
+                const option = document.createElement('option');
+                option.value = tz;
+                option.textContent = tz === browserTz ? `${tz} (Browser)` : tz;
+                tzSelect.appendChild(option);
+            });
+            tzSelect.value = appConfigs.timeZone || browserTz;
+            populateCategoryManagementTab();
+            let severityHtml = '';
+            Object.entries(appConfigs.severity).forEach(([key, level]) => { 
+                severityHtml += `<div class="severity-config-item"><h4><span class="severity-badge severity-${key}">${level.acronym}</span> ${level.name}</h4><div class="form-group"><label for="severity_${key}_acronym">Acronym (2 chars)</label><input type="text" id="severity_${key}_acronym" value="${level.acronym}" maxlength="2"></div><div class="form-group"><label for="severity_${key}_description">Description</label><textarea id="severity_${key}_description" rows="2">${level.description}</textarea></div><div class="form-group"><label for="severity_${key}_slaResponse">Response SLA</label><input type="text" id="severity_${key}_slaResponse" value="${level.slaResponse}"></div></div>`; 
+            });
+            document.getElementById('severity-tab').innerHTML = severityHtml;
+            const personnelList = document.getElementById('personnel-list');
+            personnelList.innerHTML = '';
+            appConfigs.personnel.forEach(p => addPersonEntry(false, p));
+            const snippetList = document.getElementById('snippet-list');
+            snippetList.innerHTML = '';
+            appConfigs.snippets.forEach(s => addSnippetEntry(false, s));
+        }
+
+        function openTab(evt, tabName) {
+            document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(tb => tb.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            const targetButton = evt ? evt.currentTarget : document.querySelector(`.tab-btn[onclick*="${tabName}"]`);
+            targetButton.classList.add('active');
+        }
+        
+        function updateTimezoneLabels() {
+            const tz = appConfigs.timeZone || 'UTC';
+            DOMElements.startTimeLabel.innerHTML = `Start Time (${tz.replace('_', ' ')}) <span class="required">*</span>`;
+        }
+        
+        // HISTORY MANAGEMENT
+        function openHistoryModal() {
+            modalTriggerElement = document.activeElement;
+            DOMElements.historyModal.classList.add('active');
+            populateHistoryList();
+            const closeButton = DOMElements.historyModal.querySelector('.close-btn');
+            closeButton.focus();
+            DOMElements.historyModal.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') closeHistoryModal();
+            });
+        }
+
+        function closeHistoryModal() {
+            DOMElements.historyModal.classList.remove('active');
+            if (modalTriggerElement) modalTriggerElement.focus();
+        }
+
+        function saveIncidentToHistory() {
+            let history = JSON.parse(localStorage.getItem('bita-incident-history') || '[]');
+            const logEntry = {
+                timestamp: new Date().toISOString(),
+                audiences: incidentData.audiences,
+                templates: {}
+            };
+            incidentData.audiences.forEach(audience => { logEntry.templates[audience] = generateTemplateFor('plain', audience); });
+            const existingIndex = history.findIndex(inc => inc.incidentId === incidentData.incidentId);
+            if (existingIndex > -1) {
+                if(!history[existingIndex].communicationLog) { history[existingIndex].communicationLog = []; }
+                history[existingIndex].communicationLog.unshift(logEntry);
+                Object.assign(history[existingIndex], incidentData);
+            } else {
+                incidentData.communicationLog = [logEntry];
+                history.unshift(incidentData);
+            }
+            if (history.length > 50) history = history.slice(0, 50);
+            localStorage.setItem('bita-incident-history', JSON.stringify(history));
+        }
+
+        function populateHistoryList() {
+            const history = JSON.parse(localStorage.getItem('bita-incident-history') || '[]');
+            const listContainer = document.getElementById('history-list');
+            if (history.length === 0) { listContainer.innerHTML = '<p>No incidents have been saved yet.</p>'; return; }
+            let html = '';
+            history.forEach(inc => {
+                let commsHtml = '';
+                if(inc.communicationLog && inc.communicationLog.length > 0) {
+                    commsHtml += '<div class="category-management-types"><h5>Communication History:</h5>';
+                    inc.communicationLog.forEach(log => {
+                        let templatesHtml = '';
+                        Object.entries(log.templates).forEach(([audience, template]) => {
+                            templatesHtml += `
+                                <h6 style="margin-top: 1rem; margin-bottom: 0.5rem; text-transform: capitalize;">${getAudienceTitle(audience)} Template:</h6>
+                                <pre style="white-space: pre-wrap; font-size: 0.8em; padding: 0.5rem; background: var(--bg-secondary); border-radius: 4px;">${template}</pre>
+                            `;
+                        });
+                        commsHtml += `
+                            <details style="border: 1px solid var(--border-color); border-radius: 4px; margin-top: 0.5rem;">
+                                <summary style="padding: 0.5rem;">${formatTime(log.timestamp)} - Sent to: ${log.audiences.join(', ')}</summary>
+                                <div class="category-management-types" style="background: var(--bg-primary);">${templatesHtml}</div>
+                            </details>`;
+                    });
+                    commsHtml += '</div>';
+                }
+                html += `
+                    <details class="category-management">
+                        <summary><strong style="color: var(--accent-color);">${inc.incidentId}</strong>: ${inc.incidentName}</summary>
+                        <div class="category-management-types" style="gap: 1rem;">
+                            <div><strong>Started:</strong> ${formatTime(inc.startTime)}</div>
+                            <div><strong>Summary:</strong> ${inc.impactSummary}</div>
+                            <button class="btn btn-secondary" onclick="loadIncidentForUpdate('${inc.incidentId}')">📝 Create Update</button>
+                            ${commsHtml}
+                        </div>
+                    </details>`;
+            });
+            listContainer.innerHTML = html;
+        }
+
+        function loadIncidentForUpdate(incidentId) {
+            const history = JSON.parse(localStorage.getItem('bita-incident-history') || '[]');
+            const incidentToLoad = history.find(inc => inc.incidentId === incidentId);
+            if (incidentToLoad) {
+                incidentToLoad.audiences = [];
+                sessionStorage.setItem('bita-progress', JSON.stringify(incidentToLoad));
+                location.reload(); 
+            }
+        }
+
+        function clearHistory() {
+            if (confirm('Are you sure you want to permanently delete all incident history? This cannot be undone.')) {
+                localStorage.removeItem('bita-incident-history');
+                populateHistoryList();
+                showToast('Incident history cleared!', 'success');
+            }
+        }
+
+        // CONFIG IMPORT/EXPORT
+        function exportConfig() {
+            const configData = localStorage.getItem('bita-config');
+            if (!configData) { showToast('No configuration found to export.', 'error'); return; }
+            const blob = new Blob([configData], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'incident-assistant-config.json';
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('Configuration exported!', 'success');
+        }
+
+        function importConfig() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = e => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = readerEvent => {
+                    const content = readerEvent.target.result;
+                    try {
+                        const parsed = JSON.parse(content);
+                        if (parsed.timeZone && parsed.severity && parsed.enabledCategories) {
+                            localStorage.setItem('bita-config', content);
+                            showToast('Configuration imported successfully! Reloading...', 'success');
+                            setTimeout(() => location.reload(), 1500);
+                        } else {
+                            showToast('Invalid configuration file.', 'error');
+                        }
+                    } catch (err) {
+                        showToast('Failed to read or parse file.', 'error');
+                    }
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+
+        // CATEGORY & SEVERITY MANAGEMENT
+        function populateCategoryManagementTab() {
+            const container = document.getElementById('category-management-list');
+            container.innerHTML = '';
+            for (const [catKey, catValue] of Object.entries(masterIncidentCategories)) {
+                const isCatEnabled = appConfigs.enabledCategories[catKey]?.enabled ?? true;
+                let typesHtml = '';
+                for (const [typeKey, typeName] of Object.entries(catValue.types)) {
+                    const isTypeEnabled = appConfigs.enabledCategories[catKey]?.types[typeKey] ?? true;
+                    typesHtml += `<label><input type="checkbox" data-type-key="${typeKey}" ${isTypeEnabled ? 'checked' : ''}> ${typeName}</label>`;
+                }
+                const details = document.createElement('details');
+                details.innerHTML = `
+                    <summary>
+                        <input type="checkbox" data-category-key="${catKey}" ${isCatEnabled ? 'checked' : ''} onclick="event.stopPropagation();">
+                        ${catValue.name}
+                    </summary>
+                    <div class="category-management-types">${typesHtml}</div>`;
+                container.appendChild(details);
+            }
+        }
+
+        function applyCategoryProfile(profile, show=true) {
+            const selectedCategories = profile === 'all' ? Object.keys(masterIncidentCategories) : industryProfiles[profile];
+            for (const catKey in masterIncidentCategories) {
+                const isEnabled = selectedCategories.includes(catKey);
+                appConfigs.enabledCategories[catKey].enabled = isEnabled;
+                for (const typeKey in masterIncidentCategories[catKey].types) {
+                    appConfigs.enabledCategories[catKey].types[typeKey] = isEnabled;
+                }
+            }
+            populateCategoryManagementTab();
+            if(show) showToast(`Applied ${profile} profile!`, 'success');
+        }
+
+        function populateCategoryDropdowns() {
+            const catSelect = DOMElements.incidentCategory;
+            catSelect.innerHTML = '<option value="">Select category...</option>';
+            for (const [catKey, catConfig] of Object.entries(appConfigs.enabledCategories)) {
+                if (catConfig.enabled) {
+                    const option = document.createElement('option');
+                    option.value = catKey;
+                    option.textContent = masterIncidentCategories[catKey].name;
+                    catSelect.appendChild(option);
+                }
+            }
+            updateSubcategories();
+        }
+        
+        function populateSeverityDropdown() {
+            const sevSelect = DOMElements.severity;
+            sevSelect.innerHTML = '<option value="">Select severity...</option>';
+            for (const [key, level] of Object.entries(appConfigs.severity)) {
+                const option = document.createElement('option');
+                option.value = key;
+                option.textContent = `${level.acronym} - ${level.name}`;
+                sevSelect.appendChild(option);
+            }
+        }
+
+        function updateSubcategories() {
+            const category = DOMElements.incidentCategory.value;
+            const typeSelect = DOMElements.incidentType;
+            typeSelect.innerHTML = '<option value="">Select type...</option>';
+            if (category && appConfigs.enabledCategories[category]?.enabled) {
+                const enabledTypes = appConfigs.enabledCategories[category].types;
+                for (const [typeKey, isEnabled] of Object.entries(enabledTypes)) {
+                    if (isEnabled) {
+                        const option = document.createElement('option');
+                        option.value = typeKey;
+                        option.textContent = masterIncidentCategories[category].types[typeKey];
+                        typeSelect.appendChild(option);
+                    }
+                }
+            }
+            typeSelect.onchange = () => {
+                const selectedType = typeSelect.value;
+                if (masterSuggestions[selectedType] && DOMElements.impactSummary.value === '') {
+                    DOMElements.impactSummary.value = masterSuggestions[selectedType];
+                    showToast('Impact summary suggestion applied!', 'success');
+                    updateLivePreview();
+                }
+            };
+        }
+
+        // PERSONNEL & SNIPPETS MANAGEMENT
+        function addPersonEntry(isNew = true, person = { role: '', name: '' }) { const container = document.getElementById('personnel-list'); const div = document.createElement('div'); div.className = 'person-entry'; div.innerHTML = `<input type="text" data-type="role" placeholder="Role (e.g., Incident Commander)" value="${person.role}" aria-label="Person Role"><input type="text" data-type="name" placeholder="Name" value="${person.name}" aria-label="Person Name"><button class="btn btn-danger" onclick="this.parentElement.remove()" aria-label="Remove person">-</button>`; container.appendChild(div); }
+        function addSnippetEntry(isNew = true, snippet = { key: '', value: '' }) { const container = document.getElementById('snippet-list'); const div = document.createElement('div'); div.className = 'snippet-entry'; div.innerHTML = `<input type="text" data-type="key" placeholder="Snippet Key (e.g., {{status_page}})" value="${snippet.key}" aria-label="Snippet Key"><input type="text" data-type="value" placeholder="Snippet Value" value="${snippet.value}" aria-label="Snippet Value"><button class="btn btn-danger" onclick="this.parentElement.remove()" aria-label="Remove snippet">-</button>`; container.appendChild(div); }
+        function populatePersonnelDatalist() { const datalist = document.getElementById('personnel-commanders'); datalist.innerHTML = ''; appConfigs.personnel.filter(p => p.role === 'Incident Commander').forEach(p => { const option = document.createElement('option'); option.value = p.name; datalist.appendChild(option); }); }
+        
+        // PROGRESS MANAGEMENT (SESSION)
+        function saveProgress() { const formData = {}; Object.keys(DOMElements).forEach(id => { if (DOMElements[id]) formData[id] = DOMElements[id].value; }); formData.audiences = Array.from(document.querySelectorAll('input[name="audience"]:checked')).map(cb => cb.value); formData.timeline = []; document.querySelectorAll('.timeline-entry').forEach(entry => { const timestamp = entry.querySelector('input[type="datetime-local"]').value; const event = entry.querySelector('input[type="text"]').value; if(event) formData.timeline.push({ timestamp, event }); }); sessionStorage.setItem('bita-progress', JSON.stringify(formData)); }
+        function loadProgress() { const saved = sessionStorage.getItem('bita-progress'); if (saved) { const formData = JSON.parse(saved); Object.keys(formData).forEach(id => { if (DOMElements[id] && id !== 'incidentType') { DOMElements[id].value = formData[id]; } }); if (formData.incidentCategory) { updateSubcategories(); DOMElements.incidentType.value = formData.incidentType; } if(formData.audiences) { formData.audiences.forEach(aud => { const cb = document.querySelector(`input[name="audience"][value="${aud}"]`); if(cb) { cb.checked = true; selectAudience(cb); } }); } if(formData.timeline && formData.timeline.length > 0) { document.getElementById('timeline-entries').innerHTML = ''; formData.timeline.forEach(entry => addTimelineEntry(false, entry)); } showSeverityInfo(DOMElements.severity.value); updateLivePreview(); } }
+
+        // FORM & UI LISTENERS
+        function attachFormListeners() { document.querySelector('.wizard').addEventListener('keyup', (e) => { updateLivePreview(); saveProgress(); }); document.querySelector('.wizard').addEventListener('change', (e) => { updateLivePreview(); saveProgress(); }); }
+        
+        // STEP NAVIGATION
+        function nextStep() { if (!validateCurrentStep()) { showToast('Please fill in all required fields.', 'error'); return; } if (currentStep < totalSteps) { if (currentStep === 4) saveCurrentStepData(); currentStep++; if (currentStep === 4) populateReview(); updateStepDisplay(); } }
+        function previousStep() { if (currentStep > 1) { currentStep--; updateStepDisplay(); } }
+        function goToStep(stepNum) { currentStep = stepNum; updateStepDisplay(); }
+        function goToPostMortemStep() { currentStep = 5; updateStepDisplay(); document.getElementById('outputSection').style.display = 'none'; document.querySelector('.wizard').scrollIntoView({ behavior: 'smooth' }); }
+        function updateStepDisplay() {
+            document.querySelectorAll('.step').forEach((step, index) => {
+                const isActive = index + 1 === currentStep;
+                step.classList.toggle('active', isActive);
+                step.classList.toggle('completed', index + 1 < currentStep);
+                if (isActive) { step.setAttribute('aria-current', 'step'); } else { step.removeAttribute('aria-current'); }
+            });
+            const progressWidth = ((currentStep - 1) / (totalSteps - 1)) * 100;
+            document.getElementById('step-progress').style.width = `${progressWidth}%`;
+            document.querySelectorAll('.step-content').forEach(content => content.classList.remove('active'));
+            document.querySelector(`.step-content[data-step="${currentStep}"]`).classList.add('active');
+            
+            const isIncidentActive = localStorage.getItem('bita-incident-history')?.includes(DOMElements.incidentId.value);
+            
+            document.getElementById('prevBtn').style.display = currentStep > 1 ? 'inline-flex' : 'none';
+            document.getElementById('nextBtn').style.display = currentStep < 4 ? 'inline-flex' : 'none';
+            document.getElementById('generateBtn').style.display = currentStep === 4 ? 'inline-flex' : 'none';
+            document.getElementById('postMortemBtn').style.display = currentStep === 5 ? 'inline-flex' : 'none';
+            document.getElementById('reportBtn').style.display = (currentStep >= 4 && isIncidentActive) ? 'inline-flex' : 'none';
+
+            if (currentStep >= 4) { document.getElementById('nextBtn').style.display = 'none'; }
+        }
+        function validateCurrentStep() { const fields = document.querySelector(`.step-content.active`).querySelectorAll('[required]'); for (let field of fields) { if (!field.value.trim()) { field.focus(); return false; } } if (currentStep === 3 && document.querySelectorAll('input[name="audience"]:checked').length === 0) { showToast('Please select at least one audience.', 'error'); return false; } return true; }
+
+        // DATA HANDLING & PREPARATION
+        function saveCurrentStepData() { incidentData = {}; Object.keys(DOMElements).forEach(id => { if (DOMElements[id] && id.indexOf('Select') === -1 && id.indexOf('Label') === -1 && id.indexOf('Btn') === -1 && id.indexOf('Modal') === -1) incidentData[id] = DOMElements[id].value; }); incidentData.audiences = Array.from(document.querySelectorAll('input[name="audience"]:checked')).map(cb => cb.value); incidentData.timeline = []; document.querySelectorAll('.timeline-entry').forEach(entry => { const timestamp = entry.querySelector('input[type="datetime-local"]').value; const event = entry.querySelector('input[type="text"]').value; if(event) incidentData.timeline.push({ timestamp, event }); }); incidentData.severityDetails = appConfigs.severity[incidentData.severity] || {}; }
+        function populateReview() { saveCurrentStepData(); let timelineHTML = incidentData.timeline.map(t => `<li><strong>${formatTime(t.timestamp)}:</strong> ${t.event}</li>`).join(''); const severityDetails = appConfigs.severity[incidentData.severity] || {}; document.getElementById('reviewContent').innerHTML = `<p>Please review all information before generating communications.</p><h4>Basic Info <button class="btn btn-secondary" style="font-size: 0.7rem; padding: 0.2rem 0.5rem; margin-left: 1rem;" onclick="goToStep(1)">Edit</button></h4><ul><li><strong>ID:</strong> ${incidentData.incidentId}</li><li><strong>Name:</strong> ${incidentData.incidentName}</li><li><strong>Severity:</strong> <span class="severity-badge severity-${incidentData.severity}">${severityDetails.acronym}</span> ${severityDetails.name}</li><li><strong>Started:</strong> ${formatTime(incidentData.startTime)}</li><li><strong>Commander:</strong> ${incidentData.incidentCommander}</li></ul><hr style="margin: 1rem 0;"><h4>Impact & Timeline <button class="btn btn-secondary" style="font-size: 0.7rem; padding: 0.2rem 0.5rem; margin-left: 1rem;" onclick="goToStep(2)">Edit</button></h4><p><strong>Summary:</strong> ${incidentData.impactSummary}</p><p><strong>Status:</strong> ${incidentData.currentStatus}</p>${timelineHTML ? `<h5>Timeline:</h5><ul>${timelineHTML}</ul>` : ''}<hr style="margin: 1rem 0;"><h4>Communication Plan <button class="btn btn-secondary" style="font-size: 0.7rem; padding: 0.2rem 0.5rem; margin-left: 1rem;" onclick="goToStep(3)">Edit</button></h4><ul><li><strong>Audiences:</strong> ${incidentData.audiences.join(', ')}</li><li><strong>Next Update:</strong> ${incidentData.nextUpdate || 'Not specified'}</li></ul>`; }
+
+        // TEMPLATE GENERATION
+        function generateCommunications() {
+            saveCurrentStepData(); saveIncidentToHistory(); let outputHtml = '';
+            incidentData.audiences.forEach(audience => {
+                const template = generateTemplateFor('plain', audience);
+                outputHtml += `<div class="template-preview"><h3>${getAudienceTitle(audience)}</h3><div class="preview-content" id="preview-${audience}">${template}</div><div class="template-actions"><button class="btn btn-secondary" onclick="copyToClipboard(generateTemplateFor('plain', '${audience}'))">📋 Copy Plain</button><button class="btn btn-secondary" onclick="copyToClipboard(generateTemplateFor('slack', '${audience}'))">📄 Copy in Markdown</button><a class="btn btn-secondary" href="${generateTemplateFor('email', audience)}" target="_blank">✉️ Open in Email</a></div></div>`;
+            });
+            outputHtml += `<div style="margin-top: 2rem; display: flex; gap: 1rem;"><button class="btn btn-primary" onclick="goToPostMortemStep()">📄 Go to Post-Mortem</button><button class="btn btn-secondary" onclick="startOver()">🔄 Start New Incident</button></div>`;
+            document.getElementById('generatedOutput').innerHTML = outputHtml;
+            document.getElementById('outputSection').style.display = 'block';
+            document.getElementById('outputSection').scrollIntoView({ behavior: 'smooth' });
+            updateStepDisplay(); // To show report button
+        }
+        function generatePostMortem() { if(!validateCurrentStep()){ showToast('Please fill in all required Post-Mortem fields.', 'error'); return; } saveCurrentStepData(); saveIncidentToHistory(); const template = generateTemplateFor('plain', 'postmortem'); let outputHtml = `<div class="template-preview"><h3>📄 Post-Mortem Report</h3><div class="preview-content">${template}</div><div class="template-actions"><button class="btn btn-secondary" onclick="copyToClipboard(\`${template.replace(/`/g, '\\`')}\`)">📋 Copy Report</button></div></div><div style="margin-top: 2rem;"><button class="btn btn-secondary" onclick="startOver()">🔄 Start New Incident</button></div>`; document.getElementById('generatedOutput').innerHTML = outputHtml; document.getElementById('outputSection').style.display = 'block'; document.getElementById('outputSection').scrollIntoView({ behavior: 'smooth' }); }
+        function updateLivePreview() { saveCurrentStepData(); const selectedAudiences = Array.from(document.querySelectorAll('input[name="audience"]:checked')).map(cb => cb.value); if(selectedAudiences.length === 0) { document.getElementById('livePreviewOutput').innerHTML = `<div class="help-text" style="text-align: center; padding: 2rem;">Select an audience in Step 3 to see a preview.</div>`; return; } let previewHtml = ''; selectedAudiences.forEach(audience => { const template = generateTemplateFor('plain', audience); previewHtml += `<div class="template-preview" style="margin-bottom: 1rem;"><h3 style="font-size: 1rem;">${getAudienceTitle(audience)}</h3><div class="preview-content" style="max-height: 150px;">${template}</div></div>`; }); document.getElementById('livePreviewOutput').innerHTML = previewHtml; }
+        
+        function generateIncidentReport() {
+            saveCurrentStepData();
+            const history = JSON.parse(localStorage.getItem('bita-incident-history') || '[]');
+            const currentIncident = history.find(inc => inc.incidentId === DOMElements.incidentId.value) || incidentData;
+            
+            const getStyle = (prop) => getComputedStyle(document.documentElement).getPropertyValue(prop);
+            const styles = `body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: ${getStyle('--bg-primary')}; color: ${getStyle('--text-primary')}; line-height: 1.6; margin: 0; padding: 2rem; } .report-container { max-width: 800px; margin: auto; } h1, h2, h3 { color: ${getStyle('--accent-color')}; border-bottom: 2px solid ${getStyle('--border-color')}; padding-bottom: 0.5rem; margin-top: 2rem; } .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; background: ${getStyle('--bg-secondary')}; padding: 1.5rem; border-radius: 8px; margin-top: 1rem; } .summary-grid div { padding: 0.5rem; border-left: 3px solid ${getStyle('--accent-color')}; } ol { padding-left: 20px; } li { margin-bottom: 0.75rem; } pre { white-space: pre-wrap; font-size: 0.9em; padding: 1rem; background: ${getStyle('--bg-secondary')}; border-radius: 4px; border: 1px solid ${getStyle('--border-color')}; }`;
+            
+            const severityDetails = appConfigs.severity[currentIncident.severity] || {};
+            const timelineHTML = currentIncident.timeline.map(t => `<li><strong>${formatTime(t.timestamp)}:</strong> ${t.event}</li>`).join('');
+            
+            let commsHtml = '';
+            if(currentIncident.communicationLog && currentIncident.communicationLog.length > 0) {
+                commsHtml = '<h2>Communication Log</h2>';
+                currentIncident.communicationLog.forEach(log => {
+                    let templatesHtml = '';
+                    Object.entries(log.templates).forEach(([audience, template]) => {
+                        templatesHtml += `<h3>${getAudienceTitle(audience)} Template</h3><pre>${template}</pre>`;
+                    });
+                    commsHtml += `<div><h3>Update at ${formatTime(log.timestamp)}</h3>${templatesHtml}</div>`;
+                });
+            }
+
+            let postMortemHtml = '';
+            if (currentIncident.rcaDetail || currentIncident.resolutionSteps) {
+                postMortemHtml = `
+                    <h2>Post-Mortem Analysis</h2>
+                    <h3>Root Cause Analysis</h3><p>${currentIncident.rcaDetail || 'Not provided.'}</p>
+                    <h3>Resolution Steps</h3><p>${currentIncident.resolutionSteps || 'Not provided.'}</p>
+                    <h3>Corrective Actions</h3><p>${currentIncident.correctiveActions || 'Not provided.'}</p>
+                    <h3>Lessons Learned</h3><p>${currentIncident.lessonsLearned || 'Not provided.'}</p>
+                `;
+            }
+            
+            const reportHtml = `
+                <html><head><title>Incident Report: ${currentIncident.incidentId}</title><style>${styles}</style></head>
+                <body><div class="report-container">
+                    <h1>Incident Report: ${currentIncident.incidentId}</h1>
+                    <div class="summary-grid">
+                        <div><strong>Incident Name:</strong><br>${currentIncident.incidentName}</div>
+                        <div><strong>Severity:</strong><br>${severityDetails.acronym} - ${severityDetails.name}</div>
+                        <div><strong>Start Time:</strong><br>${formatTime(currentIncident.startTime)}</div>
+                        <div><strong>Incident Commander:</strong><br>${currentIncident.incidentCommander}</div>
+                    </div>
+                    <h2>Impact Summary</h2><p>${currentIncident.impactSummary}</p>
+                    <h2>Final Status</h2><p>${currentIncident.currentStatus}</p>
+                    <h2>Timeline of Events</h2><ol>${timelineHTML}</ol>
+                    ${commsHtml}
+                    ${postMortemHtml}
+                </div></body></html>`;
+            const reportWindow = window.open('', '_blank');
+            reportWindow.document.write(reportHtml);
+            reportWindow.document.close();
+        }
+
+        function generateTemplateFor(format, audience) {
+            let text = getBaseTemplate(audience);
+            const severityDetails = appConfigs.severity[incidentData.severity] || {};
+            text = text.replace(/{{severity_acronym}}/g, severityDetails.acronym || incidentData.severity);
+            text = text.replace(/{{severity_key}}/g, incidentData.severity);
+            text = text.replace(/{{severity_name}}/g, severityDetails.name || 'N/A');
+
+            Object.keys(incidentData).forEach(key => {
+                let value = incidentData[key];
+                if (key === 'startTime' || key === 'timeline') {
+                    value = (key === 'timeline') ? incidentData.timeline.map(t => `${formatTime(t.timestamp)}: ${t.event}`).join('\n') : formatTime(value);
+                }
+                text = text.replace(new RegExp(`{{${key}}}`, 'g'), value || 'N/A');
+            });
+            appConfigs.snippets.forEach(s => text = text.replace(new RegExp(s.key.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&'), 'g'), s.value));
+            if (format === 'slack') { text = text.replace(/^(.+):/gm, '*$1:*').replace(/🚨 (S[01]) INCIDENT:/g, '🚨 *@here* *$1 INCIDENT:*'); } 
+            else if (format === 'email') { const subject = `Incident: ${incidentData.incidentName}`; return `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(text)}`; }
+            return text;
+        }
+        function getBaseTemplate(audience) { const templates = { internal: `🚨 {{severity_acronym}} INCIDENT: {{incidentName}}\n\n*Incident ID:* {{incidentId}}\n*Severity:* {{severity_acronym}} - {{severity_name}}\n*Started:* {{startTime}}\n*Commander:* {{incidentCommander}}\n\n*SITUATION:*\n{{impactSummary}}\n\n*CURRENT STATUS:*\n{{currentStatus}}\n\n*TIMELINE:*\n{{timeline}}\n\n*NEXT UPDATE:* {{nextUpdate}}`, customer: `Subject: Service Notice - {{incidentName}}\n\nDear Customer,\n\nWe are currently investigating an issue impacting our services.\n\n*What's Happening:*\n{{impactSummary}}\n\n*Current Status:*\nOur team is actively working on a resolution. We will provide another update by {{nextUpdate}}.\n\nWe apologize for any inconvenience. You can track updates on our status page: {{status_page}}\n\nThank you,\nYour Team\n\nRef: {{incidentId}}`, executive: `EXECUTIVE BRIEFING - {{severity_acronym}} INCIDENT\n\n*Incident:* {{incidentName}} (ID: {{incidentId}})\n*Severity:* {{severity_acronym}} - {{severity_name}}\n*Started:* {{startTime}}\n\n*BUSINESS IMPACT:*\n{{impactSummary}}\n\n*CURRENT STATUS:*\n{{currentStatus}}\n\n*COMMANDER:* {{incidentCommander}}\n\nCONFIDENTIAL - FOR EXECUTIVE LEADERSHIP ONLY`, postmortem: `POST-MORTEM REPORT: {{incidentName}}\n\n*Incident ID:* {{incidentId}}\n*Date:* ${formatTime(new Date().toISOString(), true)}\n*Severity:* {{severity_acronym}} - {{severity_name}}\n*Start Time:* {{startTime}}\n\n1. SUMMARY\n{{impactSummary}}\n\n2. TIMELINE OF EVENTS\n{{timeline}}\n\n3. ROOT CAUSE ANALYSIS\n{{rcaDetail}}\n\n4. RESOLUTION\n{{resolutionSteps}}\n\n5. CORRECTIVE ACTIONS\n{{correctiveActions}}\n\n6. LESSONS LEARNED\n{{lessonsLearned}}` }; return templates[audience] || 'Template not found.'; }
+
+        // UTILITY FUNCTIONS
+        function generateIncidentId() { const now = new Date(); const id = `INC-${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}-${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`; DOMElements.incidentId.value = id; updateLivePreview(); saveProgress(); showToast('Incident ID generated!'); }
+        function setStartTimeNow() { const now = new Date(); now.setMinutes(now.getMinutes() - now.getTimezoneOffset()); now.setSeconds(0); now.setMilliseconds(0); DOMElements.startTime.value = now.toISOString().slice(0, 16); updateLivePreview(); saveProgress(); }
+        function addTimelineEntry(isInitial = false, entry = { timestamp: '', event: '' }) { const container = document.getElementById('timeline-entries'); const div = document.createElement('div'); div.className = 'timeline-entry'; let timestampValue = entry.timestamp; if (isInitial && !timestampValue) { const now = new Date(); now.setMinutes(now.getMinutes() - now.getTimezoneOffset()); timestampValue = now.toISOString().slice(0, 16); } div.innerHTML = `<input type="datetime-local" value="${timestampValue}" aria-label="Timeline event timestamp"><input type="text" placeholder="Event description..." value="${entry.event}" aria-label="Timeline event description"><button class="btn btn-danger" onclick="this.parentElement.remove(); updateLivePreview(); saveProgress();" aria-label="Remove timeline entry">-</button>`; container.appendChild(div); }
+        function showSeverityInfo(severityKey) { const infoDiv = document.getElementById('severityInfo'); if (!severityKey) { infoDiv.style.display = 'none'; return; } const level = appConfigs.severity[severityKey]; infoDiv.innerHTML = `<strong>${level.acronym} - ${level.name}:</strong> ${level.description} (SLA: ${level.slaResponse})`; infoDiv.style.display = 'block'; }
+        function selectAudience(checkbox) { const label = checkbox.parentElement; if (checkbox.checked) { label.style.borderColor = 'var(--accent-color)'; label.style.background = 'var(--bg-tertiary)'; } else { label.style.borderColor = 'transparent'; label.style.background = 'var(--bg-secondary)'; } updateLivePreview(); saveProgress(); }
+        function getAudienceTitle(audience) { return { internal: '👥 Internal', customer: '📧 Customer', executive: '🎯 Executive' }[audience] || audience; }
+        function copyToClipboard(text) { navigator.clipboard.writeText(text).then(() => showToast('Copied to clipboard!', 'success'), () => showToast('Failed to copy!', 'error')); }
+        function startOver() { if (confirm('Are you sure? This will clear the form and start a new incident.')) { sessionStorage.removeItem('bita-progress'); location.reload(); } }
+        function showToast(message, type = 'success') { const toast = document.createElement('div'); toast.className = 'toast'; toast.textContent = message; toast.style.background = type === 'error' ? 'var(--danger-color)' : 'var(--success-color)'; DOMElements.toastContainer.appendChild(toast); setTimeout(() => toast.remove(), 4000); }
+        
+        function formatTime(isoString, dateOnly = false) {
+            if (!isoString) return 'N/A';
+            try {
+                const date = new Date(isoString);
+                const timeZone = appConfigs.timeZone || 'UTC';
+                const dateOptions = { year: 'numeric', month: '2-digit', day: '2-digit', timeZone };
+                if (dateOnly) { return new Intl.DateTimeFormat('en-CA', dateOptions).format(date); }
+                const timeOptions = { hour: '2-digit', minute: '2-digit', hour12: false, timeZone };
+                const formattedDate = new Intl.DateTimeFormat('en-CA', dateOptions).format(date);
+                const formattedTime = new Intl.DateTimeFormat('en-GB', timeOptions).format(date);
+                return `${formattedDate} ${formattedTime} ${timeZone.replace(/_/g, ' ')}`;
+            } catch (e) { return isoString; }
+        }
+        
+        // THEME MANAGEMENT
+        function initTheme() { const savedTheme = localStorage.getItem('bita-theme') || 'light'; document.documentElement.setAttribute('data-theme', savedTheme); document.getElementById('themeToggle').textContent = savedTheme === 'light' ? '🌙' : '☀️'; }
+        document.getElementById('themeToggle').addEventListener('click', () => { const newTheme = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light'; document.documentElement.setAttribute('data-theme', newTheme); localStorage.setItem('bita-theme', newTheme); document.getElementById('themeToggle').textContent = newTheme === 'light' ? '🌙' : '☀️'; });
+    </script>
+</body>
+</html>
